@@ -11,6 +11,8 @@ All credit goes to SwagOtaku.
 
 Kodi 19 Matrix
 
+[context.kaito.zip](https://github.com/Goldenfreddy0703/plugin.video.kaito.beta/files/8605380/context.kaito.zip)
+
 ## Big List:
 
 - [x] Some settings that you configure on kaito does not update unless you restart kodi.
