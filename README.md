@@ -11,7 +11,9 @@ All credit goes to SwagOtaku.
 
 Kodi 19 Matrix
 
-[context.kaito.zip](https://github.com/Goldenfreddy0703/plugin.video.kaito.beta/files/8605380/context.kaito.zip)
+## Kaito Updated Context Menu:
+
+[context.kaito.zip](https://github.com/Goldenfreddy0703/plugin.video.kaito.beta/files/8605380/context.kaito.zip) by @jkaw 
 
 ## Big List:
 
