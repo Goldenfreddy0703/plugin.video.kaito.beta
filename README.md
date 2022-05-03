@@ -36,7 +36,7 @@ Mal - Working with no errors thanks to @Gujal00.
 - [ ] Next Up Bugs - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747638
 - [ ] Double Skip Intro Dialog and Double Playing Next dialog - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747638
 - [ ] Next Up Adding an option for Next Up to show either episodes or anime titles - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747763
-- [ ] 12/06 update - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1769928
+- [x] 12/06 update - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1769928
 - [ ] Some anime's are not opening. https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1789393
 - [ ] Opening Episodes take a very long time to load when opening an anime.  
 - [ ] Some episodes are not working with gogo. 
