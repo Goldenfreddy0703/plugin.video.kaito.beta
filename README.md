@@ -40,6 +40,7 @@ Mal - Working with no errors thanks to @Gujal00.
 - [ ] Some anime's are not opening. https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1789393
 - [ ] Opening Episodes take a very long time to load when opening an anime.  
 - [ ] Some episodes are not working with gogo. 
+- [ ] Title Language does not change for anilist which results in giving Kaito an error. https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-2683104
 
 ## Discussion:
 
