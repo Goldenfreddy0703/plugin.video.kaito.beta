@@ -327,6 +327,17 @@ class sources(BrowserBase):
 
         if anilist_id in {127720}:
             episode += 11
+        # Remove any non alphanumeric characters, except for parenthesis. If problems arise with a title that has parenthesis, those can be removed as well and restitch it together.
+        # Parenthesis around each name is for searching nyaa and denoting the series name as the important search term.
+        tmplist = show.split('|');
+        tmpShow = ''
+        for i in range(len(tmplist)):
+            tmplist[i] = re.sub('[^A-Za-z0-9 ()]', ' ', tmplist[i])
+            if ( i == 0 ):
+                tmpShow += tmplist[i]
+            else:
+                tmpShow += '|' + tmplist[i]
+        show = tmpShow
 
         sources = self._get_episode_sources(query, anilist_id, episode, status, rescrape)
 
