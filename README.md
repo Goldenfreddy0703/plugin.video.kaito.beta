@@ -11,6 +11,19 @@ All credit goes to SwagOtaku.
 
 Kodi 19 Matrix
 
+# Installation & Updates
+
+_You can install it via repository to provide automatic updates_
+
+- Download repository: [repository.hooty](https://github.com/Goldenfreddy0703/repository.hooty/blob/master/repo/zips/repository.hooty/repository.hooty-1.0.zip)
+- Or install it via Kodi file-manager
+  - add source: https://goldenfreddy0703.github.io/repository.hooty
+
+_or install it manually (updates should be installed manually)_
+
+- [plugin.video.kaito.beta](https://github.com/Goldenfreddy0703/plugin.video.kaito.beta/archive/refs/heads/main.zip)
+
+
 ## Kaito Updated Context Menu:
 
 [context.kaito.zip](https://github.com/Goldenfreddy0703/plugin.video.kaito.beta/files/8605380/context.kaito.zip) by @jkaw 
