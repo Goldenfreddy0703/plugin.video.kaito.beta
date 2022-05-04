@@ -262,7 +262,7 @@ class sources(BrowserBase):
                             else:
                                 continue
                         else:
-                            if episode:
+                            if episode and episode_number:
                                 if int(episode) >= int(min(episode_number)) and int(episode) <= int(max(episode_number)):
                                     filtered_list.append(torrent)
                                     continue
@@ -272,8 +272,15 @@ class sources(BrowserBase):
                                 filtered_list.append(torrent)
                                 continue
                     else:
-                        filtered_list.append(torrent)
-                        continue
+                        if episode and episode_number:
+                            if int(episode) >= int(min(episode_number)) and int(episode) <= int(max(episode_number)):
+                                filtered_list.append(torrent)
+                                continue
+                            else:
+                                continue
+                        else:
+                            filtered_list.append(torrent)
+                            continue
                 if season and anime_season:
                     if int(season) > 1:
                         if int(season) == (anime_season):
@@ -312,6 +319,8 @@ class sources(BrowserBase):
 
         mapfunc = partial(self._parse_nyaa_episode_view, episode=episode)
         all_results = list(map(mapfunc, cache_list))
+        # Sort list to put torrents with extras/specials at bottom of list.
+        all_results = sorted(all_results, key=lambda x: x['release_title'].lower().find('extra') != -1 or x['release_title'].lower().find('special') != -1)
         return all_results
 
     def _process_nyaa_movie(self, url, episode):
