@@ -24,6 +24,17 @@
 			<fanart>fanart.jpg</fanart>
 		</assets>
     <news>
+Changelog 0.0.11-beta4:    
+add check to batch torrent to match seasons
+	      
+Changelog 0.0.11-beta3:
+Remove nonalphanumeric characters from anime title on scraping
+fix misnamed variable
+	    
+Changelog 0.0.11-beta2:
+Minor visual bug with the background
+Title Language seem to be fixed
+	    
 Changelog 0.0.11:
 Updated nyaa scraping
 Updated parsing filename (credits: igorcmoura/anitopy)
