@@ -25,7 +25,7 @@
 		</assets>
     <news>
 Changelog 0.0.11-beta6:
-add episode check to batches with no season. put sources with special or extra in name at bottom of auto play list
+Add episode check to batches with no season. put sources with special or extra in name at bottom of auto play list
 
 Changelog 0.0.11-beta5:
 Fix regex for batch episodes. Add bluray search term to batch episodes
