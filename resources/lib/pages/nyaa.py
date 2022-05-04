@@ -481,6 +481,7 @@ class sources(BrowserBase):
 
     def _get_episode_sources_pack(self, show, anilist_id, episode, season):
         query = '%s "Batch"|"Complete Series"' % (show)
+        query += '|"Bluray"'
 
         item_information = control.get_item_information(anilist_id)
         episodes = item_information["episode_count"]
