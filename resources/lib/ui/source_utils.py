@@ -128,19 +128,17 @@ def get_cache_check_reg(episode):
     except:
         season = '' 
 
-    reg_string = r'''(?ix)                              # Ignore case (i), and use verbose regex (x)
-                 (?:                                    # non-grouping pattern
-                   s|season                             # s or season
-                   )?
-                 ({})?                                  #season num format
-                 (?:                                    # non-grouping pattern
-                   e|x|episode|ep|ep\.|_|-|\(              # e or x or episode or start of a line
-                   )                                    # end non-grouping pattern 
-                 \s*                                    # 0-or-more whitespaces
-                 (?<![\d])
-                 ({}|{})                                # episode num format: xx or xxx
-                 (?![\d])
-                 '''.format(season, episode.zfill(2), episode.zfill(3))
+    """
+    Explanation of below regex
+    (?ix)								// This line is two flags, i and x. i flag means search is not case sensitive. x flag means ignore all white space and comments that start with #.
+    (s|season)? 						// This line is a capture. Capture anything that is s or season. Does match zero or one time
+    (1)? 								// This line is a capture. Capture the number 1 zero or one time
+    (e|x|episode|ep|ep\.|_|-|\()?	    // This line is another capture. Captures anything that is e, x, episode, ep, ep., _ , - , or (. Does 
+    (?<![\d])							// This line is a negative look behind. Makes sure no numbers are right before this.
+    (02|002)							// This line is a capture. Captures the episode numbers
+    (?![\d])							// This line is a negative look ahead. Makes sure there is no number immediately after the episode.
+    """
+    reg_string = '(?ix)(s|season)? ({})? (e|x|episode|ep|ep\.|_|-|\()? (?<![\d])({}|{})(?![\d])'.format(season, episode.zfill(2), episode.zfill(3))
 
     return re.compile(reg_string)
 
@@ -151,7 +149,10 @@ def get_best_match(dict_key, dictionary_list, episode):
 
     for i in dictionary_list:
         path = re.sub(r'\[.*?\]', '', i[dict_key].split('/')[-1])
-        i['regex_matches'] = regex.findall(path)
+        # remove empty entires from findall
+        emptyIncluded = regex.findall(path)
+        emptyRemoved = [tuple(' '.join(x).split()) for x in emptyIncluded]
+        i['regex_matches'] = emptyRemoved
         files.append(i)
 
     files = [i for i in files if len(i['regex_matches']) > 0]
