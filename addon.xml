@@ -24,6 +24,9 @@
 			<fanart>fanart.jpg</fanart>
 		</assets>
     <news>
+Changelog 0.0.11-beta5:
+Fix regex for batch episodes. Add bluray search term to batch episodes
+	    
 Changelog 0.0.11-beta4:    
 Add check to batch torrent to match seasons
 	      
