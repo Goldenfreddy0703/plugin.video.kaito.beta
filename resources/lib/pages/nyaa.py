@@ -140,6 +140,7 @@ class sources(BrowserBase):
 
         #return all_results
 
+    # Some sort of processing after getting a list of sources...
     def _process_nyaa_episodes(self, url, episode, season=None):
         json_resp = requests.get(url).text
         results = bs.BeautifulSoup(json_resp, 'html.parser')
@@ -216,7 +217,7 @@ class sources(BrowserBase):
         all_results = list(map(mapfunc, cache_list))
         return all_results
 
-    def _process_nyaa_backup(self, url, anilist_id, _zfill, episode='', rescrape=False):
+    def _process_nyaa_backup(self, url, anilist_id, _zfill, episode='', rescrape=False, season=None):
         json_resp = requests.get(url).text
         results = bs.BeautifulSoup(json_resp, 'html.parser')
         rex = r'(magnet:)+[^"]*'
@@ -246,14 +247,61 @@ class sources(BrowserBase):
 
             try:
                 if isinstance(episode_number, list):
-                    filtered_list.append(torrent)
-                    continue
-
-                if episode_number:
-                    if int(episode) == int(episode_number):
+                    if season:
+                        if anime_season:
+                            if int(season) == int(anime_season):
+                                if episode:
+                                    if int(episode) >= int(min(episode_number)) and int(episode) <= int(max(episode_number)):
+                                        filtered_list.append(torrent)
+                                        continue
+                                    else:
+                                        continue
+                                else:
+                                    filtered_list.append(torrent)
+                                    continue
+                            else:
+                                continue
+                        else:
+                            if episode:
+                                if int(episode) >= int(min(episode_number)) and int(episode) <= int(max(episode_number)):
+                                    filtered_list.append(torrent)
+                                    continue
+                                else:
+                                    continue
+                            else:
+                                filtered_list.append(torrent)
+                                continue
+                    else:
                         filtered_list.append(torrent)
+                        continue
+                if season and anime_season:
+                    if int(season) > 1:
+                        if int(season) == (anime_season):
+                            if episode_number:
+                                if int(episode) == int(episode_number):
+                                    filtered_list.append(torrent)
+                                    continue
+                                else:
+                                    continue
+                        else:
+                            continue
+                    elif int(season) <= 1:
+                        if int(anime_season) <= int(season) and episode_number:
+                            if int(episode) == int(episode_number):
+                                filtered_list.append(torrent)
+                                continue
+                            else:
+                                continue
+                        else:
+                            continue
+                else:
+                    if episode_number:
+                        if int(episode) == int(episode_number):
+                            filtered_list.append(torrent)
+                            continue
                 if int(episode_number) == 0 :
                     filtered_list.append(torrent)
+                    continue
             except:
                 filtered_list.append(torrent)
         # if not rescrape:
@@ -321,6 +369,7 @@ class sources(BrowserBase):
         except:
             pass
 
+    # Method to get sources for shows and movies from nyaa
     def get_sources(self, query, anilist_id, episode, status, media_type, rescrape):
         if media_type == 'movie':
             return self._get_movie_sources(query, anilist_id, episode)
@@ -346,6 +395,7 @@ class sources(BrowserBase):
 
         return sources
 
+    # Method to get episode sources for shows
     def _get_episode_sources(self, show, anilist_id, episode, status, rescrape):
         if rescrape:
             return self._get_episode_sources_pack(show, anilist_id, episode)
@@ -357,7 +407,10 @@ class sources(BrowserBase):
         # except ValueError:
         #     pass
 
+        # Query... ex 'SPY X FAMILY - 02'
         query = '%s "- %s"' % (show, episode.zfill(2))
+
+        # Hard Coded seasons that are weird and have second parts that have their own anilist entry.
         if anilist_id in {113538, 119661, 104578, 116742, 127720}:
             anilist_season = {
                 113538: 4,
@@ -424,7 +477,7 @@ class sources(BrowserBase):
             query += '|"S%sE%s"' %(season, episode.zfill(2))
 
         url = "https://nyaa.si/?f=0&c=1_2&q=%s" % query
-        return self._process_nyaa_episodes(url, episode)
+        return self._process_nyaa_episodes(url, episode, season)
 
     def _get_episode_sources_pack(self, show, anilist_id, episode, season):
         query = '%s "Batch"|"Complete Series"' % (show)
@@ -440,7 +493,7 @@ class sources(BrowserBase):
             #query += '|"S%sE%s"' %(season, episode.zfill(2))
 
         url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=seeders&&o=desc" % query
-        return self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True)
+        return self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True, season)
 
     def _get_movie_sources(self, query, anilist_id, episode):
         query = requests.utils.quote(query)
