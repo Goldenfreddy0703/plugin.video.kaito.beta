@@ -25,7 +25,8 @@
 		</assets>
     <news>
 Changelog 0.0.11-beta7:
-Fix issue where romajii language users get wrong series && Add proper scraping for one piece/detective conan
+Fix issue where romajii language users get wrong series
+Add proper scraping for one piece/detective conan
 
 Changelog 0.0.11-beta6:
 Add episode check to batches with no season. put sources with special or extra in name at bottom of auto play list
