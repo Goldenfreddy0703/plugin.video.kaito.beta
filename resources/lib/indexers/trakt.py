@@ -1099,15 +1099,13 @@ class TRAKTAPI(object):
         return result[0]['show']['ids']
 
     def get_trakt_id(self, item_information):
+        # Check for english or romaji title. Search for english if romaji.
         title_language = g.get_setting("titlelanguage").lower()
         if 'english' in title_language:
-            _title_language = 'english'
-        else:
-            _title_language = 'userPreferred'
-        if _title_language == 'english':
             title = item_information['info']['title']
         else:
             title = item_information['info']['aliases']
+            
         url = 'search/show?query=%s&genres=anime&extended=full' % title
         result = self._json_request(url)
 
