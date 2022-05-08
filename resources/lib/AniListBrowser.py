@@ -53,7 +53,7 @@ class AniListBrowser(object):
 
     def get_popular(self, page=1, format_in=''):
         #TASK: update season, year
-        season, year = ["FALL", 2021]
+        season, year = ["SPRING", 2022]
         variables = {
             'page': g.PAGE,
             'type': "ANIME",
@@ -92,7 +92,7 @@ class AniListBrowser(object):
 
     def get_upcoming(self, page=1, format_in=''):
         #TASK: update season, year
-        season, year = ["WINTER", 2022]
+        season, year = ["SUMMER", 2022]
         variables = {
             'page': g.PAGE,
             'type': "ANIME",
