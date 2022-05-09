@@ -126,8 +126,8 @@ def get_cache_check_reg(episode):
         info = playList[playList.getposition()].getVideoInfoTag()
         season = str(info.getSeason()).zfill(2)
     except:
-        season = '' 
-
+        season = ''
+    episode = str(episode)
     """
     Explanation of below regex
     (?ix)								// This line is two flags, i and x. i flag means search is not case sensitive. x flag means ignore all white space and comments that start with #.
@@ -138,7 +138,7 @@ def get_cache_check_reg(episode):
     (02|002)							// This line is a capture. Captures the episode numbers
     (?![\d])							// This line is a negative look ahead. Makes sure there is no number immediately after the episode.
     """
-    reg_string = '(?ix)(s|season)? ({})? (e|x|episode|ep|ep\.|_|-|\()? (?<![\d])({}|{})(?![\d])'.format(season, episode.zfill(2), episode.zfill(3))
+    reg_string = '(?ix)(s|season)? ({})? (e|x|episode|ep|ep\.|_|-|\()? (?<![\d])({}|{}|{})(?![\d])'.format(season, episode.zfill(2), episode.zfill(3), episode.zfill(4))
 
     return re.compile(reg_string)
 
