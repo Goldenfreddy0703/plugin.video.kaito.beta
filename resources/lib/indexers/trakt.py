@@ -1105,7 +1105,7 @@ class TRAKTAPI(object):
             title = item_information['info']['title']
         else:
             title = item_information['info']['aliases']
-            
+        title = re.sub('[^A-Za-z0-9 ()]', ' ', title)
         url = 'search/show?query=%s&genres=anime&extended=full' % title
         result = self._json_request(url)
 
@@ -1124,10 +1124,23 @@ class TRAKTAPI(object):
         title = item_information['info']['title']
         url = 'search/show?query=%s&genres=anime&extended=full' % title
         result = self._json_request(url)
-
         if not result:
             title = title.replace('?', '')
-            title = re.findall('\d*\D+', title)[0]
+            if 'season' in title.lower():
+                part_search = re.search('(?:part\s?\d)', title, re.I)
+                if part_search:
+                    title = title.replace(part_search[0], '')
+                first_test = re.search('[^\s]+\sseason(?=\s[^\d])', title, re.I)
+                second_test = re.search('(\d{1,2}(?:st|nd|rd|th)(?:\s|_|&|\+|,|.|-)?(?:season))', title, re.I)
+                third_test = re.search('(?:season\s?\d)', title, re.I)
+                if first_test:
+                    title = title.replace(first_test[0], '')
+                elif second_test:
+                    title = title.replace(second_test[0], '')
+                elif third_test:
+                    title = title.replace(third_test[0], '')
+            else:
+                title = re.findall('\d*\D+', title)[0]
             url = 'search/show?query=%s&genres=anime&extended=full' % title
             result = self._json_request(url)
 
@@ -1212,3 +1225,12 @@ class TRAKTAPI(object):
         url = "shows/%d/seasons/%s?extended=full" % (show_meta['trakt'], str(season))
         data = ''
         return self._process_trakt_episode_view(show_id, show_meta, season, poster, fanart, eps_watched, url, data, "animes_page/%s/%%d" % show_id)
+
+    def get_trakt_all_seasons(self, show_id):
+        url = 'shows/%d/seasons/?extended=full' % show_id
+        result = self._json_request(url)
+
+        if not result:
+            return
+
+        return result
