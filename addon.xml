@@ -24,6 +24,10 @@
 			<fanart>fanart.jpg</fanart>
 		</assets>
     <news>
+Changelog 0.0.11-beta10:
+Fix some episode processing issues for batch episodes
+Correct current and next seasons
+	    
 Changelog 0.0.11-beta9:
 Update AniListBrowser.py by updating the season, year
 Made cloud scraping a little more consistent
