@@ -186,6 +186,7 @@ class sources(BrowserBase):
 
                 if int(episode) == int(episode_number):
                     filtered_list.append(torrent)
+                    continue
                 if episode_number == 0:
                     filtered_list.append(torrent)
             except:
@@ -249,7 +250,21 @@ class sources(BrowserBase):
                 if isinstance(episode_number, list):
                     if season:
                         if anime_season:
-                            if int(season) == int(anime_season):
+                            if isinstance(anime_season, list):
+                                if season in anime_season:
+                                    if episode:
+                                        if int(episode) >= int(min(episode_number)) and int(episode) <= int(
+                                                max(episode_number)):
+                                            filtered_list.append(torrent)
+                                            continue
+                                        else:
+                                            continue
+                                    else:
+                                        filtered_list.append(torrent)
+                                        continue
+                                else:
+                                    continue
+                            elif int(season) == int(anime_season):
                                 if episode:
                                     if int(episode) >= int(min(episode_number)) and int(episode) <= int(max(episode_number)):
                                         filtered_list.append(torrent)
@@ -283,18 +298,43 @@ class sources(BrowserBase):
                             continue
                 if season and anime_season:
                     if int(season) > 1:
-                        if int(season) == (anime_season):
-                            if episode_number:
+                        if isinstance(anime_season, list):
+                            if season in anime_season:
+                                if episode_number and int(episode_number) != 0:
+                                    if int(episode) == int(episode_number):
+                                        filtered_list.append(torrent)
+                                        continue
+                                    else:
+                                        continue
+                                else:
+                                    filtered_list.append(torrent)
+                                    continue
+                            else:
+                                continue
+                        elif int(season) == int(anime_season):
+                            if episode_number and int(episode_number) != 0:
                                 if int(episode) == int(episode_number):
                                     filtered_list.append(torrent)
                                     continue
                                 else:
                                     continue
+                            else:
+                                filtered_list.append(torrent)
+                                continue
                         else:
                             continue
                     elif int(season) <= 1:
-                        if int(anime_season) <= int(season) and episode_number:
-                            if int(episode) == int(episode_number):
+                        if isinstance(anime_season, list):
+                            if season in anime_season and episode_number:
+                                if int(episode) == int(episode_number) or int(episode_number) == 0:
+                                    filtered_list.append(torrent)
+                                    continue
+                                else:
+                                    continue
+                            else:
+                                continue
+                        elif int(anime_season) <= int(season) and episode_number:
+                            if int(episode) == int(episode_number) or int(episode_number) == 0:
                                 filtered_list.append(torrent)
                                 continue
                             else:
@@ -320,7 +360,7 @@ class sources(BrowserBase):
         mapfunc = partial(self._parse_nyaa_episode_view, episode=episode)
         all_results = list(map(mapfunc, cache_list))
         # Sort list to put torrents with extras/specials at bottom of list.
-        all_results = sorted(all_results, key=lambda x: x['release_title'].lower().find('extra') != -1 or x['release_title'].lower().find('special') != -1)
+        all_results = sorted(all_results, key=lambda x: x['release_title'].lower().find('extra') != -1 or x['release_title'].lower().find('special') != -1 or x['release_title'].lower().find('movie') != -1)
         return all_results
 
     def _process_nyaa_movie(self, url, episode):
