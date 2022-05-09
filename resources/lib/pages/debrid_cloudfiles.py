@@ -41,12 +41,13 @@ class sources(BrowserBase):
         api = real_debrid.RealDebrid()
         torrents = api.list_torrents()
         query = re.sub('[^A-Za-z0-9 ()]', ' ', query)
+        episode = str(episode)
         show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
         if show:
             if 'general_title' in show:
                 show = show['general_title']
             query += ' (' + show + ')'
-        filenames = [re.sub(r'\[.*?\]\s*', '', i['filename']) for i in torrents]
+        filenames = [re.sub('[^A-Za-z0-9 ()]', '', i['filename']) for i in torrents]
         filenames_query = ','.join(filenames)
         resp = requests.get('https://armkai.vercel.app/api/fuzzypacks?dict={}&match={}'.format(filenames_query, query)).json()
 
@@ -85,12 +86,13 @@ class sources(BrowserBase):
     def premiumize_cloud_inspection(self, query, episode, anilist_id):
         cloud_items = premiumize.Premiumize().list_folder('')
         query = re.sub('[^A-Za-z0-9 ()]', ' ', query)
+        episode = str(episode)
         show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
         if show:
             if 'general_title' in show:
                 show = show['general_title']
             query += ' (' + show + ')'
-        filenames = [re.sub(r'\[.*?\]\s*', '', i['name']) for i in cloud_items]
+        filenames = [re.sub('[^A-Za-z0-9 ()]', '', i['name']) for i in cloud_items]
         filenames_query = ','.join(filenames)
         resp = requests.get('https://armkai.vercel.app/api/fuzzypacks?dict={}&match={}'.format(filenames_query, query)).json()
 
