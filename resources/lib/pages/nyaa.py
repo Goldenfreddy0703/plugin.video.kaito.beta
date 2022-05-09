@@ -12,7 +12,6 @@ from resources.lib.ui.globals import g
 from ..ui.BrowserBase import BrowserBase
 from ..debrid import real_debrid, all_debrid, premiumize
 from ..ui import database
-from ..indexers import trakt
 import requests
 import threading
 import copy
@@ -142,7 +141,7 @@ class sources(BrowserBase):
         #return all_results
 
     # Some sort of processing after getting a list of sources...
-    def _process_nyaa_episodes(self, url, episode, season=None, adjusted_episode=None, final_season=None):
+    def _process_nyaa_episodes(self, url, episode, season=None):
         json_resp = requests.get(url).text
         results = bs.BeautifulSoup(json_resp, 'html.parser')
         rex = r'(magnet:)+[^"]*'
@@ -177,21 +176,14 @@ class sources(BrowserBase):
             episode_number = parsed.get("episode_number", 0)
 
             try:
-                if final_season:
-                    if season:
-                        if final_season != int(season) and parsed['file_name'].lower().find('final season') != -1:
-                            continue
                 if isinstance(episode_number, list) or isinstance(anime_season, list):
                     filtered_list.append(torrent)
                     continue
-                if not anime_season and episode_number and adjusted_episode:
-                    if adjusted_episode > 0:
-                        if adjusted_episode == int(episode_number):
-                            filtered_list.apped(torrent)
-                            continue
+
                 if season and anime_season:
                     if int(season) != int(anime_season):
                         continue
+
                 if int(episode) == int(episode_number):
                     filtered_list.append(torrent)
                     continue
@@ -226,7 +218,7 @@ class sources(BrowserBase):
         all_results = list(map(mapfunc, cache_list))
         return all_results
 
-    def _process_nyaa_backup(self, url, anilist_id, _zfill, episode='', rescrape=False, season=None, second_part=False, final_season=None):
+    def _process_nyaa_backup(self, url, anilist_id, _zfill, episode='', rescrape=False, season=None):
         json_resp = requests.get(url).text
         results = bs.BeautifulSoup(json_resp, 'html.parser')
         rex = r'(magnet:)+[^"]*'
@@ -255,13 +247,6 @@ class sources(BrowserBase):
             episode_number = parsed.get("episode_number", '0')
 
             try:
-                if final_season:
-                    if season:
-                        if final_season != int(season) and parsed['file_name'].lower().find('final season') != -1:
-                            continue
-                if second_part:
-                    if parsed['file_name'].lower().find('part 1') != -1:
-                        continue
                 if isinstance(episode_number, list):
                     if season:
                         if anime_season:
@@ -440,15 +425,6 @@ class sources(BrowserBase):
 
         if anilist_id in {127720}:
             episode += 11
-        # If there is more than one season, episode numbers can be different based on release group.
-        # ie. Season 2 ep 3 might actually be episode 28 if there were 25 season 1 episodes.
-        total_seasons = None
-        if g.get_setting("general.enableseasonparsing") == 'true':
-            trakt_db_entry = database.get_trakt_id_from_anilist_id(anilist_id)
-            trakt_id = trakt_db_entry['trakt_id']
-            if trakt_id and int(trakt_id) > 0:
-                total_seasons = trakt.TRAKTAPI().get_trakt_all_seasons(trakt_id)
-
         # Remove any non alphanumeric characters, except for parenthesis. If problems arise with a title that has parenthesis, those can be removed as well and restitch it together.
         # Parenthesis around each name is for searching nyaa and denoting the series name as the important search term.
         tmplist = query.split('|');
@@ -462,25 +438,18 @@ class sources(BrowserBase):
         query = tmpShow
         if 'case closed' in query.lower():
             query = '(Detective Conan)'
-        sources = self._get_episode_sources(query, anilist_id, episode, status, rescrape, total_seasons)
+        sources = self._get_episode_sources(query, anilist_id, episode, status, rescrape)
 
         if not sources:
-            sources = self._get_episode_sources_backup(query, anilist_id, episode, total_seasons)
+            sources = self._get_episode_sources_backup(query, anilist_id, episode)
 
         return sources
 
     # Method to get episode sources for shows
-    def _get_episode_sources(self, show, anilist_id, episode, status, rescrape, total_seasons=None):
+    def _get_episode_sources(self, show, anilist_id, episode, status, rescrape):
         if rescrape:
             return self._get_episode_sources_pack(show, anilist_id, episode)
         episode = str(episode)
-        adjusted_episode = None
-        final_season = None
-
-        if total_seasons:
-            for i in range(len(total_seasons)):
-                if i == len(total_seasons) - 1:
-                    final_season = total_seasons[i]['number']
         # try:
         #     cached_sources, zfill_int = database.getTorrentList(anilist_id)
         #     if cached_sources:
@@ -525,32 +494,25 @@ class sources(BrowserBase):
             ret = [x for x in ret if not (x['release_title'].lower().find('movie') != -1 and x['release_title'].lower().find('+ movie') == -1)]
             return ret
         if status == 'FINISHED':
-            ret = self._get_episode_sources_pack(show, anilist_id, episode, season, final_season)
-            if not ret:
-                return self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
-            else:
-                return ret
-        return self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
+            return self._get_episode_sources_pack(show, anilist_id, episode, season)
 
-    def _get_episode_sources_backup(self, db_query, anilist_id, episode, total_seasons=None):
-        show = db_query
+        return self._process_nyaa_episodes(url, episode.zfill(2), season)
+
+    def _get_episode_sources_backup(self, db_query, anilist_id, episode):
+        show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
+
+        if not show:
+            return []
 
         episode = str(episode)
-        total_episode_adjustment = 0
-        adjusted_episode = None
-        original_title = ''
-        final_episode_num_for_part = None
-        season_episode_total = None
-        total_episodes = None
-        episode_in_season_or_part = None
 
-        if anilist_id in [113693, 121176]:
-            # TVDB sucks and puts all 3 seasons into 1 season and for dumb reasons they don't want to split it up
-            show = '(Ascendance of a Bookworm)|(Honzuki no Gekokujou  Shisho ni Naru Tame ni wa Shudan wo Erandeiraremasen)'
-            if anilist_id == 121176:
-                episode = str(int(episode) + 26)
-            else:
-                episode = str(int(episode) + 14)
+        if 'general_title' in show:
+            query = control.decode_py2(show['general_title'])
+            _zfill = show.get('zfill', 2)
+            episode = episode.zfill(_zfill)
+            query = requests.utils.quote(query)
+            url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
+            return self._process_nyaa_backup(url, anilist_id, _zfill, episode)
 
         # try:
         #     kodi_meta = ast.literal_eval(database.get_show(anilist_id)['kodi_meta'])
@@ -576,62 +538,6 @@ class sources(BrowserBase):
         else:
             season = shows.AnilistSyncDatabase().get_season_list(anilist_id, None, no_paging=True, smart_play=True)
         if season:
-            db_episode_count = database.get_episode_count(anilist_id)
-            episode_in_season_or_part = db_episode_count['episode_count']
-            if total_seasons and 'one piece' not in show.lower() and 'detective conan' not in show.lower():
-                for x in total_seasons:
-                    if x['title'].lower() != 'specials':
-                        if int(x['title'].lower().replace('season','')) < (season[0]["info"]['season']):
-                            total_episode_adjustment += x['aired_episodes']
-                        elif int(x['title'].lower().replace('season','')) == (season[0]["info"]['season']):
-                            season_episode_total = x['episode_count']
-            if season_episode_total:
-                total_episodes = season_episode_total + total_episode_adjustment
-                final_episode_num_for_part = total_episodes - episode_in_season_or_part + int(episode)
-            if total_episode_adjustment > 0:
-                adjusted_episode = int(episode) + total_episode_adjustment
-                if final_episode_num_for_part:
-                    if adjusted_episode != final_episode_num_for_part:
-                        adjusted_episode = final_episode_num_for_part
-                        episode = str(int(episode) + episode_in_season_or_part)
-                        tmplist = show.split('|');
-                        fixed_show = None;
-                        for i in range(len(tmplist)):
-                            part_search = re.search('(?:part\s?\d)', show, re.I)
-                            if part_search:
-                                tmplist[i] = tmplist[i].replace(part_search[0], '')
-                                if i == 0:
-                                    fixed_show = tmplist[i]
-                                else:
-                                    fixed_show += '|' + tmplist[i]
-                        if fixed_show:
-                            show = fixed_show
-                query = '%s "- %s"' % (show, str(adjusted_episode).zfill(2))
-                if 'season' in show.lower():
-                    tmplist = show.split('|');
-                    for i in range(len(tmplist)):
-                        tmplist[i] = tmplist[i].replace('(', '')
-                        tmplist[i] = tmplist[i].replace(')', '')
-                        first_test = re.search('[^\s]+\sseason(?=\s[^\d])', tmplist[i], re.I)
-                        second_test = re.search('(\d{1,2}(?:st|nd|rd|th)(?:\s|_|&|\+|,|.|-)?(?:season))', tmplist[i], re.I)
-                        third_test = re.search('(?:season\s?\d)', tmplist[i], re.I)
-                        if first_test:
-                            tmplist[i] = tmplist[i].replace(first_test[0], '')
-                        elif second_test:
-                            tmplist[i] = tmplist[i].replace(second_test[0], '')
-                        elif third_test:
-                            tmplist[i] = tmplist[i].replace(third_test[0], '')
-                        if first_test or second_test or third_test:
-                            if i == 0:
-                                original_title = '(' + tmplist[i] + ')'
-                            else:
-                                original_title += '|(' + tmplist[i] + ')'
-                        else:
-                            original_title = show
-                    if original_title == show:
-                        query = '%s "- %s"' % (show, str(episode).zfill(2))
-                    else:
-                        query = '%s "- %s"' % (original_title, str(adjusted_episode).zfill(2))
             if 'one piece' in show.lower() or 'detective conan' in show.lower():
                 season = str(season[0]['info']['season']).zfill(3)
                 query += '|"S%sE%s"' % (season, episode.zfill(3))
@@ -640,13 +546,9 @@ class sources(BrowserBase):
                 query += '|"S%sE%s"' %(season, episode.zfill(2))
 
         url = "https://nyaa.si/?f=0&c=1_2&q=%s" % query
-        ret =  self._process_nyaa_episodes(url, episode, season, adjusted_episode)
-        if not ret:
-            return self._get_episode_sources_pack_backup(db_query, anilist_id, episode, season, {'episode_count': episode_in_season_or_part, 'season_episodes': season_episode_total, 'series_episode': final_episode_num_for_part, 'total_episodes':total_episodes, 'previous_seasons_total': total_episode_adjustment, 'original_title': original_title})
-        else:
-            return ret
+        return self._process_nyaa_episodes(url, episode, season)
 
-    def _get_episode_sources_pack(self, show, anilist_id, episode, season, final_season):
+    def _get_episode_sources_pack(self, show, anilist_id, episode, season):
         query = '%s "Batch"|"Complete Series"' % (show)
         query += '|"Bluray"'
 
@@ -664,50 +566,7 @@ class sources(BrowserBase):
             #query += '|"S%sE%s"' %(season, episode.zfill(2))
 
         url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=seeders&&o=desc" % query
-        return self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True, season, False, final_season)
-
-    def _get_episode_sources_pack_backup(self, show, anilist_id, episode, season, part_info):
-        #{'episode_count': episode_in_season_or_part, 'season_episodes': season_episode_total,
-        # 'series_episode': final_episode_num_for_part, 'total_episodes': total_episodes, 'previous_seasons_total': total_episode_adjustment}
-        query = '%s "Batch"|"Complete Series"|"Bluray"' % (show)
-        second_part = False
-        if part_info['series_episode'] and part_info['total_episodes'] and  part_info['previous_seasons_total'] and part_info['episode_count']:
-            full_season_check = part_info['previous_seasons_total'] + part_info['episode_count']
-            if full_season_check < part_info['series_episode']:
-                second_part = True
-                tmplist = part_info['original_title'].split('|');
-                for i in range(len(tmplist)):
-                    tmplist[i] = tmplist[i].replace('(', '')
-                    tmplist[i] = tmplist[i].replace(')', '')
-                    tmplist[i] += ' ' + 'Season ' + str(int(season)) + ' Part 2'
-                    if i == 0:
-                        query = '(' + tmplist[i] + ')'
-                    else:
-                        query += '|(' + tmplist[i] + ')"batch"'
-            else:
-                tmplist = part_info['original_title'].split('|');
-                for i in range(len(tmplist)):
-                    tmplist[i] = tmplist[i].replace('(', '')
-                    tmplist[i] = tmplist[i].replace(')', '')
-                    tmplist[i] += ' ' + 'Season ' + str(int(season)) + ' Part 1'
-                    if i == 0:
-                        query = '(' + tmplist[i] + ')'
-                    else:
-                        query += '|(' + tmplist[i] + ')|"batch"'
-        else:
-            show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
-            if not show:
-                return []
-            if 'general_title' in show:
-                query = control.decode_py2(show['general_title'])
-                _zfill = show.get('zfill', 2)
-                episode = episode.zfill(_zfill)
-                query = requests.utils.quote(query)
-                url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
-                return self._process_nyaa_backup(url, anilist_id, _zfill, episode)
-
-        url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=seeders&&o=desc" % query
-        return self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True, season, second_part)
+        return self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True, season)
 
     def _get_movie_sources(self, query, anilist_id, episode):
         query = requests.utils.quote(query)
