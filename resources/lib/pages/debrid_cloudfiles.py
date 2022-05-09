@@ -20,14 +20,14 @@ class sources(BrowserBase):
         self.cloud_files = []
         self.threads = []
 
-    def get_sources(self, debrid, query, episode):
+    def get_sources(self, debrid, query, episode, anilist_id):
         if debrid.get('real_debrid'):
             self.threads.append(
-                threading.Thread(target=self.rd_cloud_inspection, args=(query, episode,)))
+                threading.Thread(target=self.rd_cloud_inspection, args=(query, episode, anilist_id)))
 
         if debrid.get('premiumize'):
             self.threads.append(
-                threading.Thread(target=self.premiumize_cloud_inspection, args=(query, episode,)))
+                threading.Thread(target=self.premiumize_cloud_inspection, args=(query, episode, anilist_id)))
 
         for i in self.threads:
             i.start()
@@ -37,10 +37,15 @@ class sources(BrowserBase):
 
         return self.cloud_files
 
-    def rd_cloud_inspection(self, query, episode):
+    def rd_cloud_inspection(self, query, episode, anilist_id):
         api = real_debrid.RealDebrid()
         torrents = api.list_torrents()
-
+        query = re.sub('[^A-Za-z0-9 ()]', ' ', query)
+        show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
+        if show:
+            if 'general_title' in show:
+                show = show['general_title']
+            query += ' (' + show + ')'
         filenames = [re.sub(r'\[.*?\]\s*', '', i['filename']) for i in torrents]
         filenames_query = ','.join(filenames)
         resp = requests.get('https://armkai.vercel.app/api/fuzzypacks?dict={}&match={}'.format(filenames_query, query)).json()
@@ -77,9 +82,14 @@ class sources(BrowserBase):
                     )
                     break
 
-    def premiumize_cloud_inspection(self, query, episode):
+    def premiumize_cloud_inspection(self, query, episode, anilist_id):
         cloud_items = premiumize.Premiumize().list_folder('')
-
+        query = re.sub('[^A-Za-z0-9 ()]', ' ', query)
+        show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
+        if show:
+            if 'general_title' in show:
+                show = show['general_title']
+            query += ' (' + show + ')'
         filenames = [re.sub(r'\[.*?\]\s*', '', i['name']) for i in cloud_items]
         filenames_query = ','.join(filenames)
         resp = requests.get('https://armkai.vercel.app/api/fuzzypacks?dict={}&match={}'.format(filenames_query, query)).json()
