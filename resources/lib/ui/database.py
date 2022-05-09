@@ -410,6 +410,26 @@ def get_show_mal(mal_id):
     control.try_release_lock(migrate_db_lock)
     return shows
 
+def get_trakt_id_from_anilist_id(anilist_id):
+    migrate_db_lock.acquire()
+    cursor = _get_connection_cursor(g.ANILIST_SYNC_DB_PATH)
+    db_query = 'SELECT * FROM shows WHERE anilist_id IN (%s)' % anilist_id
+    cursor.execute(db_query)
+    shows = cursor.fetchone()
+    cursor.close()
+    control.try_release_lock(migrate_db_lock)
+    return shows
+
+def get_episode_count(anilist_id):
+    migrate_db_lock.acquire()
+    cursor = _get_connection_cursor(g.ANILIST_SYNC_DB_PATH)
+    db_query = 'SELECT episode_count FROM shows WHERE anilist_id IN (%s)' % anilist_id
+    cursor.execute(db_query)
+    shows = cursor.fetchone()
+    cursor.close()
+    control.try_release_lock(migrate_db_lock)
+    return shows
+
 def mark_episode_unwatched_by_id():
     migrate_db_lock.acquire()
     cursor = _get_connection_cursor(g.ANILIST_SYNC_DB_PATH)
