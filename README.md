@@ -23,6 +23,7 @@ _or install it manually (updates should be installed manually)_
 
 - [plugin.video.kaito.beta](https://github.com/Goldenfreddy0703/plugin.video.kaito.beta/archive/refs/heads/main.zip)
 
+After each update, it is recommended that you clear cache/rebuild database to make sure changes take effect.
 
 ## Kaito Updated Context Menu:
 
