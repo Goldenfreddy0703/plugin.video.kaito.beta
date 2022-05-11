@@ -32,7 +32,6 @@ _or install it manually (updates should be installed manually)_
 - Latest and Latest English Dubbed - Needs to be looked at due to multiple bugs https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-2650721
 - On Netflix Skins like Auramod, When looking at the anime, ratings are not showing unless you click the anime and back out. ( I posted this further up if you would like more information on that.
 - Few suggestions for Fanart TV - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1746447
-- Arrow.png graphic change- https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747429
 - Next Up Bugs - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747638
 - Double Skip Intro Dialog and Double Playing Next dialog - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747638
 - Next Up Adding an option for Next Up to show either episodes or anime titles - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747763
