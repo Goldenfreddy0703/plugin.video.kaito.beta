@@ -36,7 +36,6 @@ _or install it manually (updates should be installed manually)_
 - Next Up Bugs - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747638
 - Double Skip Intro Dialog and Double Playing Next dialog - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747638
 - Next Up Adding an option for Next Up to show either episodes or anime titles - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747763
-- Some anime's are not opening. https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1789393
 - Opening Episodes take a very long time to load when opening an anime.  
 - Some episodes are not working with gogo. 
 - Adding the option to put your personal trakt, tvmdb, or tmdb api keys in to help faster loading.
