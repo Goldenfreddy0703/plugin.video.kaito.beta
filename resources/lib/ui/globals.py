@@ -738,6 +738,10 @@ class GlobalVariables(object):
             art["icon"] = self.DEFAULT_FANART
         if art.get("thumb") is None:
             art["thumb"] = self.DEFAULT_ICON
+        if "next page" in name.lower():
+            art["poster"] = os.path.join(self.IMAGES_PATH, 'next.png')
+            art["icon"] = os.path.join(self.IMAGES_PATH, 'next.png')
+            art["thumb"] = os.path.join(self.IMAGES_PATH, 'next.png')
         try:
             item.setArt(art)
         except:
