@@ -123,7 +123,7 @@
 		<setting id="sep"/>
 		<setting id="watchlist.update.enabled" label="40346" type="bool" default="false"/>
 		<setting id="watchlist.update.flavor" type="labelenum" subsetting="true" label="40347" values="MAL|Kitsu|AniList" default="MAL" visible="eq(-1,true)"/>
-
+		<setting id="watchlist.watched.update" type="action" subsetting="true" label="40382" option="close" action="RunPlugin(plugin://plugin.video.kaito?action=watchlist_watched_update&modal=true)" visible="eq(-2,true)"/>
 		<!-- Anilist -->
 		<setting type="lsep" label="40348"/>
 		<setting id="sep"/>

@@ -36,6 +36,7 @@ class AnilistAPI(ApiBase):
             'search/anime/genre': self.anime_genre_query,
             'search/anime': self.anime_search_query,
             'search/anime/recommendations': self.anime_recommendation_query,
+            'anime/specificid': self.anime_specific_query
             }
 
         self.TranslationNormalization = [
@@ -389,6 +390,11 @@ class AnilistAPI(ApiBase):
             self._URL, query_path='anime/id', variables=variables, dict_key=dict_key)[0]
         
         return show
+
+    @staticmethod
+    def anime_specific_query():
+        query = "query ($idMal: [Int], $page: Int = 1) {Page(page: $page, perPage: 100) {pageInfo {total perPage currentPage lastPage hasNextPage}media(idMal_in: $idMal, type: ANIME) {id idMal title{userPreferred english}coverImage{extraLarge large color}startDate{year month day}endDate{year month day}bannerImage season description type format status(version:2) episodes duration chapters volumes genres isAdult averageScore popularity nextAiringEpisode{airingAt timeUntilAiring episode}mediaListEntry{id status}studios(isMain:true){edges{isMain node{id name}}}}}}"
+        return query
 
     @staticmethod
     def anime_list_query():

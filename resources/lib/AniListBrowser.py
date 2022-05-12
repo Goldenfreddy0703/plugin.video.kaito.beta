@@ -79,7 +79,7 @@ class AniListBrowser(object):
             variables['format'] = [format_in.upper()]
 
         anilist_list = self.shows_database.extract_trakt_page(
-            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page
+            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
         self.list_builder.show_list_builder(anilist_list)
@@ -97,7 +97,7 @@ class AniListBrowser(object):
             variables['format'] = [format_in.upper()]
 
         anilist_list = self.shows_database.extract_trakt_page(
-            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page
+            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
         self.list_builder.show_list_builder(anilist_list)
@@ -136,7 +136,7 @@ class AniListBrowser(object):
             variables['format'] = [format_in.upper()]
 
         anilist_list = self.shows_database.extract_trakt_page(
-            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page
+            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
         self.list_builder.show_list_builder(anilist_list)
@@ -154,7 +154,7 @@ class AniListBrowser(object):
             variables['format'] = [format_in.upper()]
 
         anilist_list = self.shows_database.extract_trakt_page(
-            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page
+            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
         self.list_builder.show_list_builder(anilist_list)
@@ -207,7 +207,7 @@ class AniListBrowser(object):
             }
 
         anilist_list = self.shows_database.extract_trakt_page(
-            self._URL, query_path="search/anime", variables=variables, dict_key=self.anime_list_key, page=page
+            self._URL, query_path="search/anime", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
         self.list_builder.show_list_builder(anilist_list)
@@ -964,7 +964,7 @@ class AniListBrowser(object):
             variables["tags"] = tag_list
 
         anilist_list = self.shows_database.extract_trakt_page(
-            self._URL, query_path="search/anime/genre", variables=variables, dict_key=self.anime_list_key, page=page
+            self._URL, query_path="search/anime/genre", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
         self.list_builder.show_list_builder(anilist_list)

@@ -305,6 +305,22 @@ def add_mapping_id(anilist_id, column, value):
     cursor.close()
     control.try_release_lock(migrate_db_lock)
 
+def add_mapping_id_mal(mal_id, column, value):
+    migrate_db_lock.acquire()
+    cursor = _get_cursor()
+    cursor.execute('UPDATE shows SET %s=? WHERE mal_id=?' % column, (value, mal_id))
+    cursor.connection.commit()
+    cursor.close()
+    control.try_release_lock(migrate_db_lock)
+
+def add_update_shows_episodes_watched(anilist_id, column, value, episode):
+    migrate_db_lock.acquire()
+    cursor = _get_cursor()
+    cursor.execute('UPDATE episodes SET %s=? WHERE anilist_id=? AND number=?' % column, (value, anilist_id, episode))
+    cursor.connection.commit()
+    cursor.close()
+    control.try_release_lock(migrate_db_lock)
+
 def add_fanart(anilist_id, kodi_meta):
     migrate_db_lock.acquire()
     cursor = _get_cursor()
@@ -434,6 +450,14 @@ def mark_episode_unwatched_by_id():
     migrate_db_lock.acquire()
     cursor = _get_connection_cursor(g.ANILIST_SYNC_DB_PATH)
     cursor.execute('UPDATE shows SET trakt_id=? WHERE anilist_id=?', (69, 2))
+    cursor.connection.commit()
+    cursor.close()
+    control.try_release_lock(migrate_db_lock)
+
+def mark_episodes_watched(anilist_id, value, start_value, number_watched):
+    migrate_db_lock.acquire()
+    cursor = _get_connection_cursor(g.ANILIST_SYNC_DB_PATH)
+    cursor.execute('UPDATE episodes SET watched=? WHERE anilist_id=? AND number BETWEEN ? AND ?', (value, anilist_id, start_value, number_watched))
     cursor.connection.commit()
     cursor.close()
     control.try_release_lock(migrate_db_lock)

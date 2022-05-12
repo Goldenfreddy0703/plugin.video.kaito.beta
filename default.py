@@ -7,7 +7,7 @@ from resources.lib.ui.globals import g
 from resources.lib.ui.router import on_param, route, router_process
 from resources.lib.KaitoBrowser import KaitoBrowser
 from resources.lib.AniListBrowser import AniListBrowser
-from resources.lib.WatchlistIntegration import set_browser, add_watchlist, watchlist_update
+from resources.lib.WatchlistIntegration import set_browser, add_watchlist, watchlist_update, WATCHLIST_WATCHED_UPDATE
 import ast
 import sys
 
@@ -455,3 +455,5 @@ set_browser(_BROWSER)
 _add_last_watched()
 add_watchlist(MENU_ITEMS)
 router_process(g.PATH[1:], g.REQUEST_PARAMS)
+if g.PARAM_STRING == '':
+    WATCHLIST_WATCHED_UPDATE('', {'modal': 'false'})
