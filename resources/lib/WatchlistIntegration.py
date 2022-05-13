@@ -133,6 +133,8 @@ def WATCHLIST_WATCHED_UPDATE(payload, params):
                     database.mark_episodes_watched(int(x), 0, id_watched[x] + 1, 1000)
             if params['modal'] == 'true':
                 ok = xbmcgui.Dialog().ok("Updated Watchlist", "Show/Episode Markers Updated")
+        else:
+            ok = xbmcgui.Dialog().ok("Updated Watchlist", "Watchlist Not Supported")
 
 @route('watchlist_query/*')
 def WATCHLIST_QUERY(payload, params):
