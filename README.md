@@ -36,7 +36,6 @@ After each update, it is recommended that you clear cache/rebuild database to ma
 - Double Skip Intro Dialog and Double Playing Next dialog - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747638
 - Next Up Adding an option for Next Up to show either episodes or anime titles - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747763
 - Opening Episodes take a very long time to load when opening an anime.  
-- Some episodes are not working with gogo. 
 - Adding the option to put your personal trakt, tvmdb, or tmdb api keys in to help faster loading.
 
 ## Discussion:
