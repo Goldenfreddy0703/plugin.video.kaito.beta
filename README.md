@@ -30,7 +30,6 @@ After each update, it is recommended that you clear cache/rebuild database to ma
 [context.kaito.zip](https://github.com/Goldenfreddy0703/plugin.video.kaito.beta/files/8605380/context.kaito.zip) by @jkaw 
 
 ## Todo List:
-- Latest and Latest English Dubbed - Needs to be looked at due to multiple bugs https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-2650721
 - On Netflix Skins like Auramod, When looking at the anime, ratings are not showing unless you click the anime and back out. ( I posted this further up if you would like more information on that.
 - Few suggestions for Fanart TV - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1746447
 - Next Up Bugs - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747638
