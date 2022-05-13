@@ -10,6 +10,7 @@ import time
 import xbmcgui
 
 from resources.lib.ui import control
+from resources.lib.ui import database
 from resources.lib.modules.thread_pool import ThreadPool
 from resources.lib.database import Database
 from resources.lib.indexers.anilist import AnilistAPI, AnilistAPI_animelist
@@ -555,7 +556,9 @@ class AnilistSyncDatabase(Database):
             season_ids = {"{}-{}".format(i["trakt_show_id"], i["season"]): i["trakt_id"] for i in season_ids}
             for i in to_insert:
                 i["trakt_season_id"] = season_ids.get("{}-{}".format(get(i, "trakt_show_id"), get(i, "season")))
-
+        anilist_ids = {}
+        for i in to_insert:
+            anilist_ids[i.get("anilist_id")] = i.get("anilist_id")
         self.execute_sql(
             self.upsert_episode_query,
             (
@@ -585,6 +588,12 @@ class AnilistSyncDatabase(Database):
                 for i in to_insert
             ),
         )
+        episodes_watched = {}
+        for x in anilist_ids:
+            episodes_watched[x] = database.get_show(x)["watched_episodes"]
+        for x in episodes_watched:
+            if episodes_watched[x] > 0:
+                database.mark_episodes_watched(x, 1, 1, episodes_watched[x])
         self.save_to_meta_table(to_insert, "episodes", "trakt", "trakt_id")
         self._set_needs_update(episodes, to_insert)
 
@@ -1170,8 +1179,10 @@ class AnilistSyncDatabase(Database):
         no_paging = params.get("no_paging", False)
         pull_all = params.pop("pull_all", False)
         page_number = params.pop("page", 1)
-
-        page, hasNextPage = self.trakt_api.post_json_cached(url, **params)
+        if params['cached'] == 0:
+            page, hasNextPage = self.trakt_api.post_json(url, **params)
+        else:
+            page, hasNextPage = self.trakt_api.post_json_cached(url, **params)
         if not hasNextPage:
             g.REQUEST_PARAMS['no_paging'] = True
 

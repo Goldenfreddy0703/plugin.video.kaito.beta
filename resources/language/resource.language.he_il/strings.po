@@ -529,6 +529,10 @@ msgctxt "#40377"
 msgid "Seconds before closing"
 msgstr ""
 
+msgctxt "#40378"
+msgid "Enable Gogo Scraping"
+msgstr ""
+
 msgctxt "#40379"
 msgid "Enable Source Scraping"
 msgstr ""
@@ -538,5 +542,9 @@ msgid "Enable Season Parsing (Disable if Performance Issues)"
 msgstr ""
 
 msgctxt "#40381"
-msgid "Enable Season Scraping"
+msgid "Enable Source Scraping"
+msgstr ""
+
+msgctxt "#40382"
+msgid "Manual Watchlist Update"
 msgstr ""

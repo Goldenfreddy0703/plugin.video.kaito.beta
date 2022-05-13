@@ -5,6 +5,8 @@ from resources.lib.ui.globals import g
 from .ui.router import route
 from .WatchlistFlavor import WatchlistFlavor
 from .ui import database
+from resources.lib.database.anilist_sync import shows
+import xbmcgui
 
 _BROWSER = None
 def set_browser(browser):
@@ -81,6 +83,31 @@ def WATCHLIST_STATUS_TYPE_PAGES(payload, params):
     offset = action_args["offset"]
     page = action_args["page"]
     WatchlistFlavor.watchlist_status_request_pages(flavor, status, offset, int(page))
+
+@route('watchlist_watched_update')
+def WATCHLIST_WATCHED_UPDATE(payload, params):
+    flavor = g.watchlist_to_update()
+    if flavor:
+        if flavor.lower() == 'mal':
+            watchlist_data = WatchlistFlavor.get_watchlist(flavor)
+            anime_list_key = ('data', 'Page', 'media')
+            id_watched = {}
+            variables = {
+                'page': g.PAGE,
+                'idMal': []
+            }
+            for x in watchlist_data['data']:
+                variables['idMal'].append(x['node']['id'])
+                id_watched[str(x['node']['id'])] = x['list_status']['num_episodes_watched']
+            anilist_list = shows.AnilistSyncDatabase().extract_trakt_page(
+                "https://graphql.anilist.co", query_path="anime/specificid", variables=variables, dict_key=anime_list_key, page=1, cached=0
+            )
+            for x in watchlist_data['data']:
+                database.add_mapping_id_mal(x['node']['id'], 'watched_episodes', x['list_status']['num_episodes_watched'])
+                database.mark_episodes_watched(database.get_show_mal(x['node']['id'])['anilist_id'], 1, 1, x['list_status']['num_episodes_watched'])
+                database.mark_episodes_watched(database.get_show_mal(x['node']['id'])['anilist_id'], 0, x['list_status']['num_episodes_watched'] + 1, 1000)
+            if params['modal'] == 'true':
+                ok = xbmcgui.Dialog().ok("Updated Watchlist", "Show/Episode Markers Updated")
 
 @route('watchlist_query/*')
 def WATCHLIST_QUERY(payload, params):

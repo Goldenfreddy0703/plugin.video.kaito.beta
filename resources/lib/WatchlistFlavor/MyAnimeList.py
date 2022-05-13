@@ -123,6 +123,17 @@ class MyAnimeListWLF(WatchlistFlavorBase):
         url = self._to_url("users/@me/animelist")
         return self._process_status_view(url, params, status, page)
 
+    def get_watchlist(self, status=None, offset=0, page=1):
+        params = {
+            "status": status,
+            "sort": self.__get_sort(),
+            "limit": 100,
+            "offset": offset,
+            }
+
+        url = self._to_url("users/@me/animelist?fields=list_status")
+        return (self._get_request(url, headers=self.__headers(), params=params)).json()
+
     def get_watchlist_anime_entry(self, anilist_id):
         mal_id = self._get_mapping_id(anilist_id, 'mal_id')
 

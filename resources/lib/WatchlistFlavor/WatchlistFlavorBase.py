@@ -74,6 +74,9 @@ class WatchlistFlavorBase(object):
     def get_watchlist_status(self, status):
         raise NotImplementedError("get_watchlist_status should be implemented by subclass")
 
+    def get_watchlist(self):
+        raise NotImplementedError("get_watchlist should be implemented by subclass")
+
     def watchlist_update(self, episode, kitsu_id):
         raise NotImplementedError("watchlist_update should be implemented by subclass")
 

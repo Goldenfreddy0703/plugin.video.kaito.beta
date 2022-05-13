@@ -2,6 +2,7 @@
 from __future__ import absolute_import, division, unicode_literals
 
 from resources.lib.database import anilist_sync
+from resources.lib.ui import database
 from resources.lib.ui.globals import g
 from resources.lib.modules.guard_decorators import (
     guard_against_none,
@@ -805,6 +806,15 @@ class AnilistSyncDatabase(anilist_sync.AnilistSyncDatabase):
                 for i in formatted_items
             ),
         )
+        anilist_ids = {}
+        for i in formatted_items:
+            anilist_ids[formatted_items[0]['info'].get("tvshow.anilist_id")] = formatted_items[0]['info'].get("tvshow.anilist_id")
+        episodes_watched = {}
+        for x in anilist_ids:
+            episodes_watched[x] = database.get_show(x)["watched_episodes"]
+        for x in episodes_watched:
+            if episodes_watched[x] > 0:
+                database.mark_episodes_watched(x, 1, 1, episodes_watched[x])
 
     @guard_against_none_or_empty(None, 1, 2, 3)
     def format_tmdb_episodes(self, list_to_update, anilist_id, tmdb_id=None, trakt_id=None):
@@ -844,6 +854,10 @@ class AnilistSyncDatabase(anilist_sync.AnilistSyncDatabase):
             ),
         )
 
+        episodes_watched = database.get_show(anilist_id)["watched_episodes"]
+        if episodes_watched > 0:
+            database.mark_episodes_watched(anilist_id, 1, 1, episodes_watched)
+
     @guard_against_none_or_empty(None, 1, 2, 3)
     def format_simkl_episodes(self, list_to_update, anilist_id, tmdb_id=None, trakt_id=None):
         # formatted_items = self._format_objects(self._identify_episodes_to_update(list_to_update))
@@ -881,6 +895,11 @@ class AnilistSyncDatabase(anilist_sync.AnilistSyncDatabase):
                 for i in to_insert
             ),
         )
+
+
+        episodes_watched = database.get_show(anilist_id)["watched_episodes"]
+        if episodes_watched > 0:
+            database.mark_episodes_watched(anilist_id, 1, 1, episodes_watched)
 
     @guard_against_none(None, 1)
     def _try_update_seasons(self, anilist_id, trakt_show_id, trakt_season_id=None):
