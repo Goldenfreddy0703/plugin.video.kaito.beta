@@ -346,7 +346,9 @@ class AnilistAPI(ApiBase):
         return result
 
     def _get_title(self, item):
-        title = item.get(self.title_language, item.get('userPreferred'))
+        title = item.get(self.title_language)
+        if not title:
+            title = item.get('userPreferred')
         title = title.encode('ascii','ignore').decode("utf-8")
         return title
 
