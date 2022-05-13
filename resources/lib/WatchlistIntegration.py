@@ -99,13 +99,38 @@ def WATCHLIST_WATCHED_UPDATE(payload, params):
             for x in watchlist_data['data']:
                 variables['idMal'].append(x['node']['id'])
                 id_watched[str(x['node']['id'])] = x['list_status']['num_episodes_watched']
-            anilist_list = shows.AnilistSyncDatabase().extract_trakt_page(
-                "https://graphql.anilist.co", query_path="anime/specificid", variables=variables, dict_key=anime_list_key, page=1, cached=0
+            shows.AnilistSyncDatabase().extract_trakt_page(
+                "https://graphql.anilist.co", query_path="anime/specificidmal", variables=variables, dict_key=anime_list_key, page=1, cached=0
             )
-            for x in watchlist_data['data']:
-                database.add_mapping_id_mal(x['node']['id'], 'watched_episodes', x['list_status']['num_episodes_watched'])
-                database.mark_episodes_watched(database.get_show_mal(x['node']['id'])['anilist_id'], 1, 1, x['list_status']['num_episodes_watched'])
-                database.mark_episodes_watched(database.get_show_mal(x['node']['id'])['anilist_id'], 0, x['list_status']['num_episodes_watched'] + 1, 1000)
+            for x in id_watched:
+                if int(id_watched[x]) > 0:
+                    database.add_mapping_id_mal(int(x), 'watched_episodes', int(id_watched[x]))
+                    database.mark_episodes_watched(database.get_show_mal(int(x))['anilist_id'], 1, 1, int(id_watched[x]))
+                    database.mark_episodes_watched(database.get_show_mal(int(x))['anilist_id'], 0, int(id_watched[x]) + 1, 1000)
+            if params['modal'] == 'true':
+                ok = xbmcgui.Dialog().ok("Updated Watchlist", "Show/Episode Markers Updated")
+        elif flavor.lower() == 'anilist':
+            watchlist_data = WatchlistFlavor.get_watchlist(flavor)
+            id_watched = {}
+            anime_list_key = ('data', 'Page', 'media')
+            variables = {
+                'page': g.PAGE,
+                'id': []
+            }
+            for x in watchlist_data:
+                for y in x:
+                    for z in x[y]:
+                        id_watched[z["media"]["id"]] = z["progress"]
+                        variables['id'].append(z["media"]["id"])
+            shows.AnilistSyncDatabase().extract_trakt_page(
+                "https://graphql.anilist.co", query_path="anime/specificidani", variables=variables, dict_key=anime_list_key, page=1, cached=0
+            )
+
+            for x in id_watched:
+                if id_watched[x] > 0:
+                    database.add_mapping_id(int(x), 'watched_episodes', id_watched[x])
+                    database.mark_episodes_watched(int(x), 1, 1, id_watched[x])
+                    database.mark_episodes_watched(int(x), 0, id_watched[x] + 1, 1000)
             if params['modal'] == 'true':
                 ok = xbmcgui.Dialog().ok("Updated Watchlist", "Show/Episode Markers Updated")
 
