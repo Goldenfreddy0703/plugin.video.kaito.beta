@@ -133,9 +133,26 @@ def WATCHLIST_WATCHED_UPDATE(payload, params):
                     database.mark_episodes_watched(int(x), 0, id_watched[x] + 1, 1000)
             if params['modal'] == 'true':
                 ok = xbmcgui.Dialog().ok("Updated Watchlist", "Show/Episode Markers Updated")
-        else:
+        elif flavor.lower() == 'kitsu':
+            mappings, watched_eps = WatchlistFlavor.get_watchlist(flavor)
+            anime_list_key = ('data', 'Page', 'media')
+            variables = {
+                'page': g.PAGE,
+                'idMal': list(mappings.values())
+            }
+            shows.AnilistSyncDatabase().extract_trakt_page(
+                "https://graphql.anilist.co", query_path="anime/specificidmal", variables=variables, dict_key=anime_list_key, page=1, cached=0
+            )
+            for x in watched_eps:
+                if int(watched_eps[x]) > 0:
+                    database.add_mapping_id_mal(int(mappings[x]), 'watched_episodes', int(watched_eps[x]))
+                    database.mark_episodes_watched(database.get_show_mal(int(mappings[x]))['anilist_id'], 1, 1, int(watched_eps[x]))
+                    database.mark_episodes_watched(database.get_show_mal(int(mappings[x]))['anilist_id'], 0, int(watched_eps[x]) + 1, 1000)
             if params['modal'] == 'true':
-                ok = xbmcgui.Dialog().ok("Updated Watchlist", "Watchlist Not Supported")
+                ok = xbmcgui.Dialog().ok("Updated Watchlist", "Show/Episode Markers Updated")
+
+        else:
+            ok = xbmcgui.Dialog().ok("Updated Watchlist", "Watchlist Not Supported")
 
 @route('watchlist_query/*')
 def WATCHLIST_QUERY(payload, params):

@@ -120,6 +120,29 @@ class KitsuWLF(WatchlistFlavorBase):
 
         return statuses
 
+    def get_watchlist(self, status=None, offset=0, page=1):
+        url = self._to_url("edge/library-entries")
+
+        params = {
+            "fields[anime]": "titles,canonicalTitle,posterImage,episodeCount,synopsis,episodeLength,subtype",
+            "filter[user_id]": self._user_id,
+            "filter[kind]": "anime",
+            "include": "anime,anime.mappings,anime.mappings.item",
+            "page[limit]": "50",
+            "page[offset]": offset,
+            "sort": self.__get_sort(),
+            }
+        result = (self._get_request(url, headers=self.__headers(), params=params)).json()
+        self._mapping = [x for x in result['included'] if x['type'] == 'mappings']
+        ret = result["included"]
+        kitsu_ids = []
+        for x in ret:
+            kitsu_ids.append(x['id'])
+        watched_eps = {}
+        for x in result["data"]:
+            watched_eps[x['relationships']['anime']['data']['id']] = x['attributes']['progress']
+        return self.get_mal_mappings(kitsu_ids), watched_eps
+
     def get_watchlist_status(self, status, offset=0, page=1):
         url = self._to_url("edge/library-entries")
 
@@ -283,7 +306,15 @@ class KitsuWLF(WatchlistFlavorBase):
                     break
 
         return mal_id
-        
+
+    def get_mal_mappings(self, kitsu_id_list):
+        kitsu_mal_dict = {}
+        for i in self._mapping:
+            if i['attributes']['externalSite'] == 'myanimelist/anime':
+                if i['relationships']['item']['data']['id'] in kitsu_id_list:
+                    kitsu_mal_dict[i['relationships']['item']['data']['id']] = i['attributes']['externalId']
+        return kitsu_mal_dict
+
     def get_watchlist_anime_entry(self, anilist_id):
         kitsu_id = self._get_mapping_id(anilist_id, 'kitsu_id')
 
