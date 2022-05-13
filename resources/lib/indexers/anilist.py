@@ -36,7 +36,8 @@ class AnilistAPI(ApiBase):
             'search/anime/genre': self.anime_genre_query,
             'search/anime': self.anime_search_query,
             'search/anime/recommendations': self.anime_recommendation_query,
-            'anime/specificid': self.anime_specific_query
+            'anime/specificidmal': self.anime_specific_query_mal,
+            'anime/specificidani': self.anime_specific_query_ani
             }
 
         self.TranslationNormalization = [
@@ -394,8 +395,13 @@ class AnilistAPI(ApiBase):
         return show
 
     @staticmethod
-    def anime_specific_query():
+    def anime_specific_query_mal():
         query = "query ($idMal: [Int], $page: Int = 1) {Page(page: $page, perPage: 100) {pageInfo {total perPage currentPage lastPage hasNextPage}media(idMal_in: $idMal, type: ANIME) {id idMal title{userPreferred english}coverImage{extraLarge large color}startDate{year month day}endDate{year month day}bannerImage season description type format status(version:2) episodes duration chapters volumes genres isAdult averageScore popularity nextAiringEpisode{airingAt timeUntilAiring episode}mediaListEntry{id status}studios(isMain:true){edges{isMain node{id name}}}}}}"
+        return query
+
+    @staticmethod
+    def anime_specific_query_ani():
+        query = "query ($id: [Int], $page: Int = 1) {Page(page: $page, perPage: 100) {pageInfo {total perPage currentPage lastPage hasNextPage}media(id_in: $id, type: ANIME) {id idMal title{userPreferred english}coverImage{extraLarge large color}startDate{year month day}endDate{year month day}bannerImage season description type format status(version:2) episodes duration chapters volumes genres isAdult averageScore popularity nextAiringEpisode{airingAt timeUntilAiring episode}mediaListEntry{id status}studios(isMain:true){edges{isMain node{id name}}}}}}"
         return query
 
     @staticmethod
@@ -508,6 +514,7 @@ class AnilistAPI_animelist(ApiBase):
 
         self.query = {
             'animelist/status': self.animelist_status_query,
+            'animelist/allstatus': self.all_animelist_status_query
             }
 
         self.TranslationNormalization = [
@@ -862,6 +869,54 @@ class AnilistAPI_animelist(ApiBase):
             date_added = datetime.today().strftime('%Y-%m-%d')
         finally:
             return date_added
+
+    @staticmethod
+    def all_animelist_status_query():
+        query = '''
+        query ($userId: Int, $userName: String, $status_in: [MediaListStatus], $type: MediaType, $sort: [MediaListSort]) {
+            MediaListCollection(userId: $userId, userName: $userName, status_in: $status_in, type: $type, sort: $sort) {
+                lists {
+                    entries {
+                        ...mediaListEntry
+                        }
+                    }
+                }
+            }
+
+        fragment mediaListEntry on MediaList {
+            id
+            mediaId
+            status
+            progress
+            customLists
+            media {
+                id
+                idMal
+                title {
+                    userPreferred,
+                    romaji,
+                    english
+                }
+                coverImage {
+                    extraLarge
+                }
+                startDate {
+                    year,
+                    month,
+                    day
+                }
+                description
+                synonyms
+                format                
+                status
+                episodes
+                genres
+                duration
+            }
+        }
+        '''
+
+        return query
 
     @staticmethod
     def animelist_status_query():

@@ -352,6 +352,64 @@ class AniListWLF(WatchlistFlavorBase):
     def watchlist_update(self, anilist_id, episode):
         return lambda: self.__update_library(episode, anilist_id)
 
+    def get_watchlist(self, status=None, offset=0, page=1):
+        query = '''
+        query ($userId: Int, $userName: String, $status_in: [MediaListStatus], $type: MediaType, $sort: [MediaListSort]) {
+            MediaListCollection(userId: $userId, userName: $userName, status_in: $status_in, type: $type, sort: $sort) {
+                lists {
+                    entries {
+                        ...mediaListEntry
+                        }
+                    }
+                }
+            }
+
+        fragment mediaListEntry on MediaList {
+            id
+            mediaId
+            status
+            progress
+            customLists
+            media {
+                id
+                idMal
+                title {
+                    userPreferred,
+                    romaji,
+                    english
+                }
+                coverImage {
+                    extraLarge
+                }
+                startDate {
+                    year,
+                    month,
+                    day
+                }
+                description
+                synonyms
+                format                
+                status
+                episodes
+                genres
+                duration
+            }
+        }
+        '''
+
+        variables = {
+            'userId': int(self._user_id),
+            'username': self._username,
+            'status_in': ["CURRENT", "PLANNING", "COMPLETED","DROPPED","PAUSED","REPEATING"],
+            'type': 'ANIME',
+            'sort': [self.__get_sort()]
+            }
+
+        result = self._post_request(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
+
+        return result.json()['data']['MediaListCollection']['lists']
+
+
     def __update_library(self, episode, anilist_id):
         query = '''
         mutation ($mediaId: Int, $progress : Int, $status: MediaListStatus) {
