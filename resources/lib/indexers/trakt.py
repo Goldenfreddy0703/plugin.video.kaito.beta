@@ -1104,24 +1104,9 @@ class TRAKTAPI(object):
         if 'english' in title_language:
             title = item_information['info']['title']
         else:
-            title = item_information['info']['aliases']
-        title = re.sub('[^A-Za-z0-9 ()]', ' ', title)
-        url = 'search/show?query=%s&genres=anime&extended=full' % title
-        result = self._json_request(url)
-
-        if not result:
-            title = title.replace('?', '')
-            title = re.findall('\d*\D+', title)[0]
-            url = 'search/show?query=%s&genres=anime&extended=full' % title
-            result = self._json_request(url)
-
-        if not result:
-            return
-
-        return result[0]['show']['ids']
-
-    def get_trakt_id_backup(self, item_information):
-        title = item_information['info']['title']
+            split_title = item_information['info']['aliases'].split(")")
+            title = split_title[1]
+        title = re.sub('[^A-Za-z0-9]', ' ', title)
         url = 'search/show?query=%s&genres=anime&extended=full' % title
         result = self._json_request(url)
         if not result:
@@ -1146,7 +1131,23 @@ class TRAKTAPI(object):
 
         if not result:
             return
-        
+
+        return result[0]['show']['ids']
+
+    def get_trakt_id_backup(self, item_information):
+        title = item_information['info']['title']
+        url = 'search/show?query=%s&genres=anime&extended=full' % title
+        result = self._json_request(url)
+
+        if not result:
+            title = title.replace('?', '')
+            title = re.findall('\d*\D+', title)[0]
+            url = 'search/show?query=%s&genres=anime&extended=full' % title
+            result = self._json_request(url)
+
+        if not result:
+            return
+
         if len(result) == 1:
             show = result[0]['show']
         else:
