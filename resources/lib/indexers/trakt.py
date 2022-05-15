@@ -1106,6 +1106,8 @@ class TRAKTAPI(object):
         else:
             split_title = item_information['info']['aliases'].split(")")
             title = split_title[1]
+            if title == '':
+                title = item_information['info']['title']
         title = re.sub('[^A-Za-z0-9]', ' ', title)
         url = 'search/show?query=%s&genres=anime&extended=full' % title
         result = self._json_request(url)
