@@ -646,7 +646,7 @@ class sources(BrowserBase):
         else:
             return ret
 
-    def _get_episode_sources_pack(self, show, anilist_id, episode, season, final_season):
+    def _get_episode_sources_pack(self, show, anilist_id, episode, season, final_season=None):
         query = '%s "Batch"|"Complete Series"' % (show)
         query += '|"Bluray"'
 
