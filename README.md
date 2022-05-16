@@ -37,7 +37,7 @@ After each update, it is recommended that you clear cache/rebuild database to ma
 - Next Up Adding an option for Next Up to show either episodes or anime titles - https://github.com/SwagOtaku/plugin.video.kaito/discussions/99#discussioncomment-1747763
 - Opening Episodes take a very long time to load when opening an anime.  
 - Adding the option to put your personal trakt, tvmdb, or tmdb api keys in to help faster loading.
-
+- No Rating/Clear logos load in all catagories unless you open the anime and back out. 
 ## Discussion:
 
 https://github.com/SwagOtaku/plugin.video.kaito/discussions/99
