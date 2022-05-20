@@ -548,3 +548,7 @@ msgstr ""
 msgctxt "#40382"
 msgid "Manual Watchlist Update"
 msgstr ""
+
+msgctxt "#40382"
+msgid "Menus Too Slow?"
+msgstr ""

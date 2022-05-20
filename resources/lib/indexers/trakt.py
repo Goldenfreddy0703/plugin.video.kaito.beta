@@ -993,6 +993,7 @@ class TRAKTAPI(object):
         return response
 
     def _parse_trakt_seasons(self, res, show_id, eps_watched):
+        parsed = database.get_show(show_id)
         parsed = ast.literal_eval(res['kodi_meta'])
 
         try:
@@ -1048,7 +1049,9 @@ class TRAKTAPI(object):
             info['aired'] = res['first_aired'][:10]
         except:
             pass
-        info['tvshowtitle'] = ast.literal_eval(database.get_show(show_id)['kodi_meta'])['title_userPreferred']
+
+        import pickle
+        info['tvshowtitle'] = pickle.loads(database.get_show(show_id)['info'])['title']
         info['mediatype'] = 'episode'
         parsed = g.allocate_item(name, "play/" + str(url), False, image, info, fanart, poster, True)
         database._update_episode(show_id, season, res['number'], res['number_abs'], update_time, parsed)
@@ -1070,7 +1073,7 @@ class TRAKTAPI(object):
         result = self._json_request(url)
 
         try:
-            season_year = kodi_meta['start_date'].split('-')[0] + '-'
+            season_year = str(kodi_meta['year']) + '-'
             seasons = [k for k in result if k['number'] != 0]
             season = next((item for item in seasons if season_year in item["first_aired"]), None)
             database._update_season(anilist_id, season['number'])
@@ -1189,7 +1192,8 @@ class TRAKTAPI(object):
 
     def get_trakt_seasons(self, anilist_id, meta_ids, kodi_meta, db_correction):
         fanart = self._add_fanart(anilist_id, meta_ids, kodi_meta)
-        url = 'shows/%d/seasons?extended=full' % meta_ids['trakt']
+
+        url = 'shows/%d/seasons?extended=full' % meta_ids['trakt_id']
 
         if db_correction:
             target = self._process_season_view
@@ -1205,27 +1209,29 @@ class TRAKTAPI(object):
             return self.get_trakt_episodes(anilist_id, seasons['season']), 'episodes'
 
         show = database.get_show(anilist_id)
-        kodi_meta = ast.literal_eval(show['kodi_meta'])
+        import pickle
+        kodi_meta = pickle.loads(show['info'])
 
-        if kodi_meta['episodes'] is None or int(kodi_meta['episodes']) > 30:
+        if show['episode_count'] is None or int(show['episode_count']) > 30:
             return
 
-        meta_ids = ast.literal_eval(show['meta_ids'])
+        meta_ids = control.get_item_information(anilist_id)
 
         return self.get_trakt_seasons(anilist_id, meta_ids, kodi_meta, db_correction)
 
     def get_trakt_episodes(self, show_id, season):
-        show_meta = ast.literal_eval(database.get_show(show_id)['meta_ids'])
-        kodi_meta = ast.literal_eval(database.get_show(show_id)['kodi_meta'])
+        show_meta = database.get_show(show_id)
+        import pickle
+        kodi_meta = pickle.loads(show_meta['info'])
         fanart = kodi_meta.get('fanart')
         poster = kodi_meta.get('poster')
-        eps_watched = kodi_meta.get('eps_watched')
-        episodes = database.get_episode_list(int(show_id))
+        eps_watched = show_meta.get('watched_episodes')
+        #episodes = database.get_episode_list(int(show_id))
 
-        if episodes:
-            return self._process_trakt_episodes(show_id, season, episodes, eps_watched)
+        #if episodes:
+        #    return self._process_trakt_episodes(show_id, season, episodes, eps_watched)
 
-        url = "shows/%d/seasons/%s?extended=full" % (show_meta['trakt'], str(season))
+        url = "shows/%d/seasons/%s?extended=full" % (show_meta['trakt_id'], str(season))
         data = ''
         return self._process_trakt_episode_view(show_id, show_meta, season, poster, fanart, eps_watched, url, data, "animes_page/%s/%%d" % show_id)
 

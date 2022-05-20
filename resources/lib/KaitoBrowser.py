@@ -61,12 +61,25 @@ class KaitoBrowser(BrowserBase):
             "New Search",
             action="search",
         )
-        for i in history_array:
-            g.add_directory_item(
-                i,
-                action="search_results",
-                action_args=control.construct_action_args(i),
-            )
+
+        if g.get_bool_setting("general.menus"):
+            for i in history_array:
+                action_args = {
+                    'query': i,
+                    'page': 1
+                }
+                g.add_directory_item(
+                    i,
+                    action="search",
+                    action_args=control.construct_action_args(action_args),
+                )
+        else:
+            for i in history_array:
+                g.add_directory_item(
+                    i,
+                    action="search_results",
+                    action_args=control.construct_action_args(i),
+                )
         g.add_directory_item(
             "Clear Search History...",
             action="clear_history",
@@ -368,14 +381,16 @@ class KaitoBrowser(BrowserBase):
             from .AniListBrowser import AniListBrowser
             show_meta = AniListBrowser().get_anilist(anilist_id)
 
-        if not show_meta['meta_ids']:
-            name = ast.literal_eval(show_meta['kodi_meta'])['name']
-            trakt_id = trakt.TRAKTAPI().get_trakt_id(name)
+        if not show_meta['trakt_id']:
+            item_information = control.get_item_information(anilist_id)
+            trakt_id = trakt.TRAKTAPI().get_trakt_id(item_information)
 
             if not trakt_id:
                 return self.get_anime_simkl(anilist_id, filter_lang)
 
-            database.add_meta_ids(anilist_id, str(trakt_id))
+            database.add_meta_ids(anilist_id, trakt_id['trakt'], 'trakt_id')
+            database.add_meta_ids(anilist_id, trakt_id['tvdb'], 'tvdb_id')
+            database.add_meta_ids(anilist_id, trakt_id['tmdb'], 'tmdb_id')
 
         return self.get_anime_trakt(anilist_id, filter_lang=filter_lang)
 

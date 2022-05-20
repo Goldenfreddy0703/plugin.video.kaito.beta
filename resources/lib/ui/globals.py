@@ -518,7 +518,36 @@ class GlobalVariables(object):
             'fanart': fanart
             }
         new_res['name'] = name
-        new_res['url'] = url
+        urlsplit = url.split('/')
+        params = {'action': urlsplit[0]}
+        params['action_args'] = {}
+        if 'next page' not in name.lower():
+            if info['mediatype'] is 'tvshow':
+                params['action_args']['anilist_id'] = urlsplit[1]
+                if urlsplit[2]:
+                    params['action_args']['mal_id'] = urlsplit[2]
+            elif info['mediatype'] is 'episode':
+                params['action_args']['anilist_id'] = urlsplit[1]
+                params['action_args']['episode'] = urlsplit[2]
+            elif info['mediatype'] is 'movie':
+                params['action_args']['anilist_id'] = urlsplit[1]
+            params['action_args']['mediatype'] = info['mediatype']
+            url_route = self.create_url(self.BASE_URL, params)
+            if url_route:
+                new_res['url'] = url_route
+            else:
+                new_res['url'] = url
+        else:
+            if urlsplit[0] == 'search':
+                params['action_args']['query'] = urlsplit[1]
+                params['action_args']['page'] = urlsplit[2]
+            else:
+                params['action_args']['page'] = urlsplit[1]
+            url_route = self.create_url(self.BASE_URL, params)
+            if url_route:
+                new_res['url'] = url_route
+            else:
+                new_res['url'] = url
         new_res['info'] = info
         return new_res
 
