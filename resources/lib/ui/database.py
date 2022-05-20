@@ -7,6 +7,7 @@ import re
 import time
 import xbmcvfs
 import threading
+import pickle
 from . import control
 from resources.lib.ui.globals import g
 import xbmcgui
@@ -61,9 +62,17 @@ def get(function, duration, *args, **kwargs):
 
         # Because I'm lazy, I've added this crap code so sources won't cache if there are no results
         if not sources:
-            cache_insert(key, fresh_result)
+            g.CACHE.set(
+                key,
+                fresh_result
+            )
+            #cache_insert(key, fresh_result)
         elif len(data[1]) > 0:
-            cache_insert(key, fresh_result)
+            g.CACHE.set(
+                key,
+                fresh_result
+            )
+            #cache_insert(key, fresh_result)
         else:
             return None
 
@@ -265,17 +274,17 @@ def _build_episode_table():
     cursor.close()
     control.try_release_lock(migrate_db_lock)
 
-def _update_show(anilist_id, mal_id, kodi_meta, last_updated=''):
+def _update_show(anilist_id, kodi_meta, last_updated=''):
     migrate_db_lock.acquire()
     cursor = _get_cursor()
     try:
         cursor.execute('PRAGMA foreign_keys=OFF')
         cursor.execute(
-            "REPLACE INTO shows ("
-            "anilist_id, mal_id, kodi_meta, last_updated, air_date)"
+            "REPLACE INTO shows_meta ("
+            "id, type, value)"
             "VALUES "
-            "(?, ?, ?, ?, ?)",
-            (anilist_id, mal_id, kodi_meta, last_updated, ''))
+            "(?, ?, ?)",
+            (anilist_id, 'anilist', kodi_meta))
         cursor.execute('PRAGMA foreign_keys=ON')
         cursor.connection.commit()
         cursor.close()
@@ -289,10 +298,10 @@ def _update_show(anilist_id, mal_id, kodi_meta, last_updated=''):
     finally:
         control.try_release_lock(migrate_db_lock)
 
-def add_meta_ids(anilist_id, meta_ids):
+def add_meta_ids(anilist_id, id, meta_name):
     migrate_db_lock.acquire()
     cursor = _get_cursor()
-    cursor.execute('UPDATE shows SET meta_ids=? WHERE anilist_id=?', (meta_ids, anilist_id))
+    cursor.execute('UPDATE shows SET %s=? WHERE anilist_id=?' % meta_name, (id, anilist_id))
     cursor.connection.commit()
     cursor.close()
     control.try_release_lock(migrate_db_lock)
@@ -420,6 +429,16 @@ def get_show_mal(mal_id):
     migrate_db_lock.acquire()
     cursor = _get_connection_cursor(g.ANILIST_SYNC_DB_PATH)
     db_query = 'SELECT * FROM shows WHERE mal_id IN (%s)' % mal_id
+    cursor.execute(db_query)
+    shows = cursor.fetchone()
+    cursor.close()
+    control.try_release_lock(migrate_db_lock)
+    return shows
+
+def get_show_meta(id):
+    migrate_db_lock.acquire()
+    cursor = _get_connection_cursor(g.ANILIST_SYNC_DB_PATH)
+    db_query = 'SELECT * FROM shows_meta WHERE id IN (%s)' % id
     cursor.execute(db_query)
     shows = cursor.fetchone()
     cursor.close()
