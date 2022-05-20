@@ -12,6 +12,7 @@ import json
 import time
 import datetime
 import ast
+import pickle
 import xbmc
 from functools import partial
 from .ui.globals import g
@@ -75,16 +76,20 @@ class AniListBrowser(object):
             'sort': "POPULARITY_DESC"
             }
 
+        if g.get_bool_setting("general.menus"):
+            variables['page'] = page
+
         if format_in:
             variables['format'] = [format_in.upper()]
 
         anilist_list = self.shows_database.extract_trakt_page(
             self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
-
-        self.list_builder.show_list_builder(anilist_list)
-        # popular = database.get(self.get_base_res, 0.125, variables, page)
-        # return self._process_anilist_view(popular, "anilist_popular/%d", page)
+        if g.get_bool_setting("general.menus"):
+            popular = database.get(self.get_base_res, 0.125, variables, page)
+            return self._process_anilist_view(popular, "anilist_popular/%d", page)
+        else:
+            self.list_builder.show_list_builder(anilist_list)
 
     def get_trending(self, page=1, format_in=''):
         variables = {
@@ -93,16 +98,22 @@ class AniListBrowser(object):
             'sort': ["TRENDING_DESC"]
             }
 
+        if g.get_bool_setting("general.menus"):
+            variables['page'] = page
+
         if format_in:
             variables['format'] = [format_in.upper()]
 
         anilist_list = self.shows_database.extract_trakt_page(
-            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
-            )
+            self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page,
+            cached=1
+        )
 
-        self.list_builder.show_list_builder(anilist_list)
-        # trending = database.get(self.get_base_res, 0.125, variables, page)
-        # return self._process_anilist_view(trending, "anilist_trending/%d", page)
+        if g.get_bool_setting("general.menus"):
+            trending = database.get(self.get_base_res, 0.125, variables, page)
+            return self._process_anilist_view(trending, "anilist_trending/%d", page)
+        else:
+            self.list_builder.show_list_builder(anilist_list)
 
     def get_upcoming(self, page=1, format_in=''):
         # using https://manga.tokyo/columns/what-is-a-cour-and-a-season-in-anime/ to define seasons
@@ -125,11 +136,20 @@ class AniListBrowser(object):
         elif next_month <= 12:
             season = 'FALL'
 
-        variables = {
-            'page': g.PAGE,
-            'type': "ANIME",
-            'season': season,
-            'seasonYear': year
+        if g.get_bool_setting("general.menus"):
+            variables = {
+                'page': page,
+                'type': "ANIME",
+                'season': season,
+                'year': str(year) + '%',
+                'sort': "POPULARITY_DESC"
+            }
+        else:
+            variables = {
+                'page': g.PAGE,
+                'type': "ANIME",
+                'season': season,
+                'seasonYear': year
             }
 
         if format_in:
@@ -139,9 +159,11 @@ class AniListBrowser(object):
             self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
-        self.list_builder.show_list_builder(anilist_list)
-        # upcoming = database.get(self.get_base_res, 0.125, variables, page)
-        # return self._process_anilist_view(upcoming, "anilist_upcoming/%d", page)
+        if g.get_bool_setting("general.menus"):
+            upcoming = database.get(self.get_base_res, 0.125, variables, page)
+            return self._process_anilist_view(upcoming, "anilist_upcoming/%d", page)
+        else:
+            self.list_builder.show_list_builder(anilist_list)
 
     def get_all_time_popular(self, page=1, format_in=''):
         variables = {
@@ -150,6 +172,9 @@ class AniListBrowser(object):
             'sort': "POPULARITY_DESC"
             }
 
+        if g.get_bool_setting("general.menus"):
+            variables['page'] = page
+
         if format_in:
             variables['format'] = [format_in.upper()]
 
@@ -157,9 +182,11 @@ class AniListBrowser(object):
             self._URL, query_path="search/anime/list", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
-        self.list_builder.show_list_builder(anilist_list)
-        # all_time_popular = database.get(self.get_base_res, 0.125, variables, page)
-        # return self._process_anilist_view(all_time_popular, "anilist_all_time_popular/%d", page)
+        if g.get_bool_setting("general.menus"):
+            all_time_popular = database.get(self.get_base_res, 0.125, variables, page)
+            return self._process_anilist_view(all_time_popular, "anilist_all_time_popular/%d", page)
+        else:
+            self.list_builder.show_list_builder(anilist_list)
 
     @use_cache()
     def get_airing(self, page=1, format_in=''):
@@ -206,13 +233,18 @@ class AniListBrowser(object):
             'type': "ANIME"
             }
 
+        if g.get_bool_setting("general.menus"):
+            variables['page'] = page
+
         anilist_list = self.shows_database.extract_trakt_page(
             self._URL, query_path="search/anime", variables=variables, dict_key=self.anime_list_key, page=page, cached=1
             )
 
-        self.list_builder.show_list_builder(anilist_list)
-        # search = database.get(self.get_search_res, 0.125, variables, page)
-        # return self._process_anilist_view(search, "search/%s/%%d" % query, page)
+        if g.get_bool_setting("general.menus"):
+            search = database.get(self.get_search_res, 0.125, variables, page)
+            return self._process_anilist_view(search, "search/%s/%%d" % query, page)
+        else:
+            self.list_builder.show_list_builder(anilist_list)
 
     def get_recommendation(self, anilist_id, page=1):
         variables = {
@@ -636,7 +668,11 @@ class AniListBrowser(object):
 
         if not in_database:
             self._database_update_show(res)
-
+            kodi_meta = None
+        else:
+            kodi_meta = in_database['info']
+            if kodi_meta:
+                kodi_meta = pickle.loads(kodi_meta)
         #remove cached eps for releasing shows every five days so new eps metadata can be shown
         if res.get('status') == 'RELEASING':
             try:
@@ -648,8 +684,6 @@ class AniListBrowser(object):
                     database.remove_episodes(res['id'])
             except:
                 pass
-
-        kodi_meta = ast.literal_eval(database.get_show(str(res['id']))['kodi_meta'])
 
         title = res['title'][self._TITLE_LANG]
         if not title:
@@ -699,9 +733,10 @@ class AniListBrowser(object):
             "name": title,
             "url": "animes/%s/%s/" % (res['id'], res.get('idMal')),
             "image": res['coverImage']['extraLarge'],
-            "fanart": kodi_meta.get('fanart', res['coverImage']['extraLarge']),
             "info": info
         }
+        if kodi_meta:
+            base["fanart"] = kodi_meta.get('fanart', res['coverImage']['extraLarge'])
 
         if res['format'] == 'MOVIE' and res['episodes'] == 1:
             base['url'] = "play_movie/%s/1/" % (res['id'])
@@ -758,7 +793,6 @@ class AniListBrowser(object):
         
         database._update_show(
             res['id'],
-            res.get('idMal'),
             str(kodi_meta)
             )
 
@@ -789,7 +823,7 @@ class AniListBrowser(object):
                                 is_dir,
                                 base["image"],
                                 base["info"],
-                                base["fanart"],
+                                base.get("fanart", None),
                                 base["image"],
                                 is_playable)
             ]
@@ -801,7 +835,7 @@ class AniListBrowser(object):
                                 is_dir,
                                 base["image"],
                                 base["info"],
-                                base["fanart"],
+                                base.get("fanart", None),
                                 base["image"],
                                 is_playable)
             ]
@@ -812,7 +846,7 @@ class AniListBrowser(object):
                                 is_dir,
                                 base["image"],
                                 base["info"],
-                                base["fanart"],
+                                base.get("fanart", None),
                                 base["image"])
             )
 

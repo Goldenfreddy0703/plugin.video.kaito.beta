@@ -160,9 +160,11 @@ def MAL_SEASON_EPISODES(payload, params):
     # import xbmcgui
     # xbmcgui.Dialog().textviewer('dsds', str(item_information))
 
-@route('animes/*')
+@route('animes')
 def ANIMES_PAGE(payload, params):
-    anilist_id, mal_id, filter_lang = payload.rsplit("/")
+    anilist_id = params['action_args']['anilist_id']
+    mal_id = params['action_args']['mal_id']
+    filter_lang = None
     anime_general, content = _BROWSER.get_anime_init(anilist_id, filter_lang)
     return g.draw_items(anime_general, content)
 
@@ -231,19 +233,50 @@ def LATEST_DUB(payload, params):
 
 @route('anilist_trending')
 def ANILIST_TRENDING(payload, params):
-    _ANILIST_BROWSER.get_trending()
+    if g.get_bool_setting("general.menus"):
+        action_args = params.get('action_args')
+        if isinstance(action_args, dict):
+            g.draw_items(_ANILIST_BROWSER.get_trending(int(action_args['page'])))
+        else:
+            g.draw_items(_ANILIST_BROWSER.get_trending())
+    else:
+        _ANILIST_BROWSER.get_trending()
 
 @route('anilist_popular')
 def ANILIST_POPULAR(payload, params):
-    _ANILIST_BROWSER.get_popular()
+    if g.get_bool_setting("general.menus"):
+        action_args = params.get('action_args')
+        if isinstance(action_args, dict):
+            g.draw_items(_ANILIST_BROWSER.get_popular(int(action_args['page'])))
+        else:
+            g.draw_items(_ANILIST_BROWSER.get_popular())
+
+    else:
+        _ANILIST_BROWSER.get_popular()
 
 @route('anilist_upcoming')
 def ANILIST_UPCOMING(payload, params):
-    _ANILIST_BROWSER.get_upcoming()
+    if g.get_bool_setting("general.menus"):
+        action_args = params.get('action_args')
+        if isinstance(action_args, dict):
+            g.draw_items(_ANILIST_BROWSER.get_upcoming(int(action_args['page'])))
+        else:
+            g.draw_items(_ANILIST_BROWSER.get_upcoming())
+
+    else:
+        _ANILIST_BROWSER.get_upcoming()
 
 @route('anilist_all_time_popular')
 def ANILIST_ALL_TIME_POPULAR(payload, params):
-    _ANILIST_BROWSER.get_all_time_popular()
+    if g.get_bool_setting("general.menus"):
+        action_args = params.get('action_args')
+        if isinstance(action_args, dict):
+            g.draw_items(_ANILIST_BROWSER.get_all_time_popular(int(action_args['page'])))
+        else:
+            g.draw_items(_ANILIST_BROWSER.get_all_time_popular())
+
+    else:
+        _ANILIST_BROWSER.get_all_time_popular()
 
 @route('anilist_genres')
 def ANILIST_GENRES(payload, params):
@@ -269,7 +302,11 @@ def CLEAR_HISTORY(payload, params):
 
 @route('search')
 def SEARCH(payload, params):
-    query = control.keyboard(g.lang(30010))
+    action_args = params.get('action_args')
+    if isinstance(action_args, dict):
+        query = action_args['query']
+    else:
+        query = control.keyboard(g.lang(30010))
     if not query:
         return False
 
@@ -277,7 +314,14 @@ def SEARCH(payload, params):
     if "Yes" in g.get_setting('searchhistory') :
         SearchHistory().add_search_history("show", query)
 
-    _ANILIST_BROWSER.get_search(query)
+    if g.get_bool_setting("general.menus"):
+        action_args = params.get('action_args')
+        if isinstance(action_args, dict):
+            g.draw_items(_ANILIST_BROWSER.get_search(query, (int(action_args['page']))))
+        else:
+            g.draw_items(_ANILIST_BROWSER.get_search(query))
+    else:
+        _ANILIST_BROWSER.get_search(query)
 
 @route('search_results')
 def SEARCH_PAGES(payload, params):
@@ -371,10 +415,12 @@ def GET_SOURCES(payload, params):
     #                     indexer=indexer)
     player.play_source(link, action_args, watchlist_update)
 
-@route('play/*')
+@route('play')
 def PLAY(payload, params):
-    anilist_id, episode, filter_lang = payload.rsplit("/")
-    sources = _BROWSER.get_sources(anilist_id, episode, filter_lang, 'show')
+    action_args = params.get('action_args')
+    anilist_id = params['action_args']['anilist_id']
+    episode = params['action_args']['episode']
+    sources = _BROWSER.get_sources(anilist_id, episode, "", 'show')
     _mock_args = {"anilist_id": anilist_id}
 
     if g.get_setting('general.playstyle.episode') == '1' or params.get('source_select'):
@@ -391,12 +437,7 @@ def PLAY(payload, params):
 
         link = resolver.doModal(sources, {}, False)
 
-    player.play_source(link,
-                        anilist_id,
-                        watchlist_update,
-                        _BROWSER.get_episodeList,
-                        int(episode),
-                        filter_lang)
+    player.play_source(link, action_args, watchlist_update)
 
 @route('rescrape_play/*')
 def RESCRAPE_PLAY(payload, params):

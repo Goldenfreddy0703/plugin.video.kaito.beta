@@ -28,6 +28,12 @@
     		<setting id="reuselanguageinvoker.status" label="40374" type="text" default="Enabled" enable="false"/>
     		<setting id="reuselanguageinvoker.toggle" label="40375" type="action" option="close" 
 			 action="RunPlugin(plugin://plugin.video.kaito?action=toggleLanguageInvoker)"/>
+
+		<setting type="lsep" label="Menus"/>
+		<setting id="sep"/>
+		<setting type="text"  label="Below setting will speed up menus, but at the cost of some descriptions, images, and possibly some watchlist functionality."/>
+		<setting type="text"  label="Currently only works on shows from search and the main menu lists. Watchlist lists are not affected."/>
+		<setting id="general.menus" label="Use Kaito 10 Menus" type="bool" default="false"/>
 	</category>
 
 	<!-- Playback -->

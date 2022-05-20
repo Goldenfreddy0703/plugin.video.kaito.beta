@@ -304,28 +304,25 @@ class SIMKLAPI(ApiBase):
             url += filter_lang
         
         name = 'Ep. %d (%s)' % (res['episode'], res.get('title'))
-        image =  self.imageBaseUrl % res['img']
+        #image =  self.imageBaseUrl % res['img']
         info = {}
         info['plot'] = res['description']
         info['title'] = res['title']
         info['season'] = 1
         info['episode'] = res['episode']
-        try:
-            if int(eps_watched) >= res['episode']:
-                info['playcount'] = 1
-        except:
-            pass
+
         try:
             info['aired'] = res['date'][:10]
         except:
             pass
-        info['tvshowtitle'] = ast.literal_eval(database.get_show(anilist_id)['kodi_meta'])['title_userPreferred']
+        import pickle
+        info['tvshowtitle'] = pickle.loads(database.get_show(anilist_id)['info'])['title']
         info['mediatype'] = 'episode'
-        parsed = g.allocate_item(name, "play/" + str(url), False, image, info, fanart, poster, True)
+        parsed = g.allocate_item(name, "play/" + str(url), False, None, info, None, None, True)
         return parsed
 
     def _process_episode_view(self, anilist_id, json_resp, filter_lang, base_plugin_url, page):
-        kodi_meta = ast.literal_eval(database.get_show(anilist_id)['kodi_meta'])
+        kodi_meta = database.get_show(anilist_id)['info']
         fanart = kodi_meta.get('fanart')
         poster = kodi_meta.get('poster')
         eps_watched = kodi_meta.get('eps_watched')
@@ -339,10 +336,10 @@ class SIMKLAPI(ApiBase):
         show = database.get_show(anilist_id)
 
         if show['simkl_id']:
-            return self.get_episodes(anilist_id, filter_lang), 'episodes'
+            return self.get_episodes(show['simkl_id'], control.get_item_information(anilist_id)), 'episodes'
 
-        show_meta = show['meta_ids']
-        kodi_meta = ast.literal_eval(show['kodi_meta'])
+        import pickle
+        kodi_meta = pickle.loads(show['info'])
         mal_id = show['mal_id']
 
         if not mal_id:
@@ -350,15 +347,15 @@ class SIMKLAPI(ApiBase):
             database.add_mapping_id(anilist_id, 'mal_id', str(mal_id))
 
         simkl_id = str(self.get_anime_id(mal_id))
+        #import web_pdb
+        #web_pdb.set_trace()
         database.add_mapping_id(anilist_id, 'simkl_id', simkl_id)
-        if show_meta:
-            show_meta = ast.literal_eval(show['meta_ids'])
-            if not kodi_meta.get('fanart'):
-                kodi_meta['fanart'] = TMDBAPI().showFanart(show_meta).get('fanart')
-                database.update_kodi_meta(int(anilist_id), kodi_meta)
+        #if show:
+            #if not kodi_meta.get('fanart'):
+                #kodi_meta['fanart'] = TMDBAPI().showFanart(show).get('fanart')
+                #database.update_kodi_meta(int(anilist_id), kodi_meta)
 
-
-        return self.get_episodes(anilist_id, filter_lang), 'episodes'
+        return self.get_episodes(simkl_id, control.get_item_information(anilist_id)), 'episodes'
 
     def _get_episodes(self, anilist_id):
         simkl_id = database.get_show(anilist_id)['simkl_id']
@@ -399,6 +396,7 @@ class SIMKLAPI(ApiBase):
             "anime/episodes/{}?extended=full".format(simkl_id)
         )
         episodes = [episode for episode in episodes if episode.get("type") == "episode"]
+        ret = []
         for episode in episodes:
             episode.update(
                 {
@@ -407,8 +405,11 @@ class SIMKLAPI(ApiBase):
                     "args": self._create_args(item_information, episode["episode"]),
                 }
             )
-        
-        return self._handle_response(episodes)
+            tmp = self._parse_episode_view(episode, item_information['anilist_id'], None, None,
+                                     item_information['watched_episodes'], None)
+            ret.append(tmp)
+
+        return ret
 
 
     def get_simkl_id(self, item_information):
@@ -433,6 +434,19 @@ class SIMKLAPI(ApiBase):
         )
 
         return simkl_id
+
+    def get_anime_id(self, mal_id):
+        data = {
+            "mal": mal_id,
+            "client_id": self.ClientID,
+        }
+        url = self._to_url("search/id")
+        json_resp = self._json_request(url, data)
+        if not json_resp:
+            return []
+
+        anime_id = json_resp[0]['ids'].get('simkl')
+        return anime_id
 
     def get_mal_id(self, anilist_id):
         arm_resp = self._json_request("https://armkai.vercel.app/api/search?type=anilist&id={}".format(anilist_id))
