@@ -579,7 +579,7 @@ class AnilistSyncDatabase(Database):
                     None,
                     None,
                     None,
-                    self._create_args(i),
+                    self._create_args(i['trakt_object']),
                     g.validate_date(get(i, "last_watched_at")),
                     g.validate_date(get(i, "collected_at")),
                     self.trakt_api.meta_hash,
