@@ -525,9 +525,9 @@ class sources(BrowserBase):
             ret = [x for x in ret if not (x['release_title'].lower().find('movie') != -1 and x['release_title'].lower().find('+ movie') == -1)]
             return ret
         if status == 'FINISHED':
-            ret = self._get_episode_sources_pack(show, anilist_id, episode, season, final_season)
+            ret = self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
             if not ret:
-                return self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
+                return self._get_episode_sources_pack(show, anilist_id, episode, season, final_season)
             else:
                 return ret
         return self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
@@ -551,6 +551,35 @@ class sources(BrowserBase):
                 episode = str(int(episode) + 26)
             else:
                 episode = str(int(episode) + 14)
+
+        tmplist = show.split('|');
+        fixed_show = None;
+        for i in range(len(tmplist)):
+            part_search = re.search('(?:part\s?\d)', show, re.I)
+            if part_search:
+                tmplist[i] = tmplist[i].replace(part_search[0], '')
+                if i == 0:
+                    fixed_show = tmplist[i]
+                else:
+                    fixed_show += '|' + tmplist[i]
+            tmplist[i] = tmplist[i].replace('(', '')
+            tmplist[i] = tmplist[i].replace(')', '')
+            first_test = re.search('[^\s]+\sseason(?=\s[^\d])', tmplist[i], re.I)
+            second_test = re.search('(\d{1,2}(?:st|nd|rd|th)(?:\s|_|&|\+|,|.|-)?(?:season))', tmplist[i], re.I)
+            third_test = re.search('(?:season\s?\d)', tmplist[i], re.I)
+            if first_test:
+                tmplist[i] = tmplist[i].replace(first_test[0], '')
+            elif second_test:
+                tmplist[i] = tmplist[i].replace(second_test[0], '')
+            elif third_test:
+                tmplist[i] = tmplist[i].replace(third_test[0], '')
+            if first_test or second_test or third_test:
+                if i == 0:
+                    original_title = '(' + tmplist[i] + ')'
+                else:
+                    original_title += '|(' + tmplist[i] + ')'
+        if original_title != '':
+            show = original_title
 
         # try:
         #     kodi_meta = ast.literal_eval(database.get_show(anilist_id)['kodi_meta'])
@@ -647,11 +676,40 @@ class sources(BrowserBase):
             return ret
 
     def _get_episode_sources_pack(self, show, anilist_id, episode, season, final_season=None):
+        tmplist = show.split("|")
+        original_title = None
+        for i in range(len(tmplist)):
+            part_search = re.search('(?:part\s?\d)', show, re.I)
+            if part_search:
+                tmplist[i] = tmplist[i].replace(part_search[0], '')
+            tmplist[i] = tmplist[i].replace('(', '')
+            tmplist[i] = tmplist[i].replace(')', '')
+            first_test = re.search('[^\s]+\sseason(?=\s[^\d])', tmplist[i], re.I)
+            second_test = re.search('(\d{1,2}(?:st|nd|rd|th)(?:\s|_|&|\+|,|.|-)?(?:season))', tmplist[i], re.I)
+            third_test = re.search('(?:season\s?\d)', tmplist[i], re.I)
+            if first_test:
+                tmplist[i] = tmplist[i].replace(first_test[0], '')
+            elif second_test:
+                tmplist[i] = tmplist[i].replace(second_test[0], '')
+            elif third_test:
+                tmplist[i] = tmplist[i].replace(third_test[0], '')
+            if first_test or second_test or third_test:
+                if i == 0:
+                    original_title = '(' + tmplist[i] + ')'
+                else:
+                    original_title += '|(' + tmplist[i] + ')'
+        if original_title:
+            show = original_title
+
         query = '%s "Batch"|"Complete Series"' % (show)
         query += '|"Bluray"'
 
         item_information = control.get_item_information(anilist_id)
         episodes = item_information["episode_count"]
+        if int(episodes) < int(episode):
+            # This means the season is split cour
+            # Maybe try to get actual episode count?
+            episodes = None
         if episodes:
             if 'one piece' in show.lower() or 'detective conan' in show.lower():
                 query += '|"001-{0}"|"001~{0}"|"001 - {0}"|"001 ~ {0}"'.format(episodes)
@@ -695,9 +753,9 @@ class sources(BrowserBase):
                     else:
                         query += '|(' + tmplist[i] + ')|"batch"'
         else:
-            show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
-            if not show:
-                return []
+            fetched_name = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
+            if fetched_name:
+                show = fetched_name
             if 'general_title' in show:
                 query = control.decode_py2(show['general_title'])
                 _zfill = show.get('zfill', 2)
