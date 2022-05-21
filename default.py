@@ -504,9 +504,9 @@ def TMDB_HELPER(payload, params):
             pars['source_select'] = 'true'
         PLAY_MOVIE('', pars)
     else:
-        if "part" in top_result['anilist_object']['info']['title'].lower() and not 'attack on titan' == trakt_show_name:
+        if ("part" in top_result['anilist_object']['info']['title'].lower() or "part" in result[1]['anilist_object']['info']['title'].lower()) and not 'attack on titan' == trakt_show_name.lower():
             import xbmcgui
-            if xbmcgui.Dialog().yesno('Anime Season', "Is this season split into parts AND is this episode in the second part?"):
+            if xbmcgui.Dialog().yesno('Anime Season', "Is this season split into parts AND is this episode in the second part? \nIf you do not know, please look up your anime and season on anilist.co, myanimelist.net, or kitsu.io"):
                 params['variables']['search'] = trakt_show_name + " part 2"
                 params['dict_key'] = ('data', 'Page', 'media')
                 params['query_path'] = 'search/anime'
