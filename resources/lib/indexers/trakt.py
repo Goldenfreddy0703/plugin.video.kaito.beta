@@ -1243,3 +1243,15 @@ class TRAKTAPI(object):
             return
 
         return result
+
+    def get_trakt_show(self, show_id, mediatype):
+        if mediatype == 'movie':
+            url = 'movies/%d/' % show_id
+        else:
+            url = 'shows/%d/' % show_id
+        result = self._json_request(url)
+
+        if not result:
+            return
+
+        return result
