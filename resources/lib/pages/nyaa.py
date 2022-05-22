@@ -525,11 +525,11 @@ class sources(BrowserBase):
             ret = [x for x in ret if not (x['release_title'].lower().find('movie') != -1 and x['release_title'].lower().find('+ movie') == -1)]
             return ret
         if status == 'FINISHED':
-            ret = self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
+            ret = self._get_episode_sources_pack(show, anilist_id, episode, season, final_season)
             if not ret:
-                return self._get_episode_sources_pack(show, anilist_id, episode, season, final_season)
+                return self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
             else:
-                return ret
+                return ret + self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
         return self._process_nyaa_episodes(url, episode.zfill(2), season, adjusted_episode, final_season)
 
     def _get_episode_sources_backup(self, db_query, anilist_id, episode, total_seasons=None):
@@ -552,8 +552,8 @@ class sources(BrowserBase):
             else:
                 episode = str(int(episode) + 14)
 
-        tmplist = show.split('|');
-        fixed_show = None;
+        tmplist = show.split('|')
+        fixed_show = None
         for i in range(len(tmplist)):
             part_search = re.search('(?:part\s?\d)', show, re.I)
             if part_search:
@@ -678,10 +678,14 @@ class sources(BrowserBase):
     def _get_episode_sources_pack(self, show, anilist_id, episode, season, final_season=None):
         tmplist = show.split("|")
         original_title = None
+        item_information = control.get_item_information(anilist_id)
+        episodes = item_information["episode_count"]
+        part_num = None
         for i in range(len(tmplist)):
             part_search = re.search('(?:part\s?\d)', show, re.I)
             if part_search:
                 tmplist[i] = tmplist[i].replace(part_search[0], '')
+                part_num = int([int(s) for s in part_search[0].split() if s.isdigit()][0])
             tmplist[i] = tmplist[i].replace('(', '')
             tmplist[i] = tmplist[i].replace(')', '')
             first_test = re.search('[^\s]+\sseason(?=\s[^\d])', tmplist[i], re.I)
@@ -700,16 +704,29 @@ class sources(BrowserBase):
                     original_title += '|(' + tmplist[i] + ')'
         if original_title:
             show = original_title
-
+            total_seasons = None
+            if g.get_setting("general.enableseasonparsing") == 'true':
+                trakt_db_entry = database.get_trakt_id_from_anilist_id(anilist_id)
+                trakt_id = trakt_db_entry['trakt_id']
+                if trakt_id and int(trakt_id) > 0:
+                    total_seasons = trakt.TRAKTAPI().get_trakt_all_seasons(trakt_id)
+            if total_seasons and 'one piece' not in show.lower() and 'detective conan' not in show.lower():
+                current_season_total = 0
+                previous_episodes = 0
+                for x in total_seasons:
+                    if x['title'].lower() != 'specials':
+                        if int(x['title'].lower().replace('season', '')) < int(season):
+                            previous_episodes += x['aired_episodes']
+                        elif int(x['title'].lower().replace('season', '')) == int(season):
+                            current_season_total = x['episode_count']
+                episodes = str(current_season_total)
+                if part_num and part_num >= 2:
+                    ep_adjustment = int(current_season_total) - int(item_information["episode_count"])
+                    if int(episode) < ep_adjustment:
+                        episode = str(int(episode) + ep_adjustment)
         query = '%s "Batch"|"Complete Series"' % (show)
         query += '|"Bluray"'
 
-        item_information = control.get_item_information(anilist_id)
-        episodes = item_information["episode_count"]
-        if int(episodes) < int(episode):
-            # This means the season is split cour
-            # Maybe try to get actual episode count?
-            episodes = None
         if episodes:
             if 'one piece' in show.lower() or 'detective conan' in show.lower():
                 query += '|"001-{0}"|"001~{0}"|"001 - {0}"|"001 ~ {0}"'.format(episodes)
@@ -722,7 +739,23 @@ class sources(BrowserBase):
             #query += '|"S%sE%s"' %(season, episode.zfill(2))
 
         url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=seeders&&o=desc" % query
-        return self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True, season, False, final_season)
+        ret = self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True, season, False, final_season)
+
+        if part_num:
+            parsed_list = []
+            for x in ret:
+                part_search_after = re.search('(?:part\s?\d)', x['release_title'], re.I)
+                if part_search_after:
+                    part_actual = int([int(s) for s in part_search_after[0].split() if s.isdigit()][0])
+                    if part_num == part_actual:
+                        parsed_list.append(x)
+                    else:
+                        continue
+                else:
+                    parsed_list.append(x)
+            return parsed_list
+        else:
+            return ret
 
     def _get_episode_sources_pack_backup(self, show, anilist_id, episode, season, part_info):
         #{'episode_count': episode_in_season_or_part, 'season_episodes': season_episode_total,
