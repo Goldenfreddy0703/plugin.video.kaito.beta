@@ -207,7 +207,6 @@ class AnilistAPI(ApiBase):
         :param params: URL params for request
         :return: JSON response
         """
-
         get_dict = params.pop('dict_key')
         query_path = params.pop('query_path')
         if query_path:
@@ -838,7 +837,9 @@ class AnilistAPI_animelist(ApiBase):
         return result
 
     def _get_title(self, item):
-        title = item.get(self.title_language, item.get('userPreferred'))
+        title = item.get(self.title_language)
+        if not title:
+            title = item.get('userPreferred')
         title = title.encode('ascii','ignore').decode("utf-8")
         return title
 
