@@ -405,11 +405,13 @@ class SIMKLAPI(ApiBase):
                     "args": self._create_args(item_information, episode["episode"]),
                 }
             )
-            tmp = self._parse_episode_view(episode, item_information['anilist_id'], None, None,
-                                     item_information['watched_episodes'], None)
-            ret.append(tmp)
-
-        return ret
+            if g.get_bool_setting('general.menus'):
+                tmp = self._parse_episode_view(episode, item_information['anilist_id'], None, None, item_information['watched_episodes'], None)
+                ret.append(tmp)
+        if g.get_bool_setting("general.menus"):
+            return ret
+        else:
+            return self._handle_response(episodes)
 
 
     def get_simkl_id(self, item_information):
