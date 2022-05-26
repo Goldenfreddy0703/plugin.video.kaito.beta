@@ -306,6 +306,10 @@ class GlobalVariables(object):
         self.MAL_DUB_FILE_PATH = control.translate_path(
             os.path.join(self.ADDON_USERDATA_PATH, "mal_dub.json")
         )
+        # This will change sometimes with kodi versions
+        self.KODI_VIDEO_DB_PATH = control.translate_path(
+            os.path.join(self.KODI_DATABASE_PATH, "MyVideos119.db")
+        )
 
     # region runtime settings
     def set_runtime_setting(self, setting_id, value):
@@ -785,12 +789,24 @@ class GlobalVariables(object):
             # Convert dates to localtime for display
             g.log("Converting TV Info Dates to local time for display", "debug")
             self.convert_info_dates(info)
+        url = self.create_url(self.BASE_URL, params)
 
+        if not g.get_bool_setting("watchlist.update.enabled"):
+            if params['action'] == 'get_sources' or params['action'] == 'play_movie':
+                from resources.lib.ui import database
+                pc = info.get('playcount')
+                if not pc:
+                    default_playcount = database.checkPlayed(url)
+                    if default_playcount:
+                        info['playcount'] = default_playcount['playCount']
+                elif int(pc) == 0:
+                    default_playcount = database.checkPlayed(url)
+                    if default_playcount:
+                        info['playcount'] = default_playcount['playCount']
         item.setInfo("video", info)
 
         bulk_add = params.pop("bulk_add", False)
-        url = self.create_url(self.BASE_URL, params)
-        #url = self.addon_url(params)
+
         if bulk_add:
             return url, item, is_folder
         else:

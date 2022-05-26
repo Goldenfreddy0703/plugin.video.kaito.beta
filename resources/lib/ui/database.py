@@ -481,6 +481,15 @@ def mark_episodes_watched(anilist_id, value, start_value, number_watched):
     cursor.close()
     control.try_release_lock(migrate_db_lock)
 
+def checkPlayed(url):
+    migrate_db_lock.acquire()
+    cursor = _get_connection_cursor(g.KODI_VIDEO_DB_PATH)
+    cursor.execute('SELECT playCount FROM files WHERE strFilename = ?',  [url])
+    shows = cursor.fetchone()
+    cursor.close()
+    control.try_release_lock(migrate_db_lock)
+    return shows
+
 def remove_season(anilist_id):
     migrate_db_lock.acquire()
     cursor = _get_cursor()
