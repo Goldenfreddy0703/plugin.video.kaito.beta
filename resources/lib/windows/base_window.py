@@ -35,6 +35,11 @@ class BaseWindow(xbmcgui.WindowXMLDialog):
             self.item_information = control.get_item_information(actionArgs["anilist_id"])
         elif actionArgs.get('playnext'):
             self.item_information = actionArgs
+            self.setProperty('item.info.%s' % 'tvshowtitle', self.item_information.get('tvshowtitle'))
+            self.setProperty('item.info.%s' % 'episode', str(self.item_information.get('episode')))
+            self.setProperty('item.info.%s' % 'aired', self.item_information.get('aired'))
+            self.setProperty('item.info.%s' % 'rating', str(round(self.item_information.get('rating'), 2)))
+            self.setProperty('item.info.%s' % 'season', str(self.item_information.get('season')))
         else:
             self.item_information = {}
 

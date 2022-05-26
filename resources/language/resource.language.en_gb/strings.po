@@ -549,6 +549,18 @@ msgctxt "#40382"
 msgid "Manual Watchlist Update"
 msgstr ""
 
-msgctxt "#40382"
-msgid "Menus Too Slow?"
+msgctxt "#40383"
+msgid "seconds"
+msgstr ""
+
+msgctxt "#40384"
+msgid "Playing in"
+msgstr ""
+
+msgctxt "#40385"
+msgid "Next Up"
+msgstr ""
+
+msgctxt "#40386"
+msgid "Play now"
 msgstr ""
