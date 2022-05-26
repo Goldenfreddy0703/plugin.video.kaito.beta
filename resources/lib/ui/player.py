@@ -306,6 +306,11 @@ class PlayerDialogs(xbmc.Player):
         next_info = {
             "art": {}
         }
+        next_info['episode'] = next_item.getVideoInfoTag().getEpisode()
+        next_info['season'] = next_item.getVideoInfoTag().getSeason()
+        next_info['tvshowtitle'] = next_item.getVideoInfoTag().getTVShowTitle()
+        next_info['aired'] = next_item.getVideoInfoTag().getFirstAired()
+        next_info['rating'] = next_item.getVideoInfoTag().getRating()
         next_info['art']['thumb'] = next_item.getArt('thumb')
         next_info['name'] = next_item.getLabel()
         next_info['playnext'] = True
