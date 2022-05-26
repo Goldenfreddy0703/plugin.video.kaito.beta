@@ -542,7 +542,7 @@ msgid "Enable Season Parsing (Disable if Performance Issues)"
 msgstr ""
 
 msgctxt "#40381"
-msgid "Enable Source Scraping"
+msgid "Enable Season Part Scraping"
 msgstr ""
 
 msgctxt "#40382"
