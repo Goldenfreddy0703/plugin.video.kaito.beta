@@ -414,12 +414,18 @@ class sources(BrowserBase):
         return all_results        
 
     def get_latest(self, page=1):
-        url = "https://nyaa.si/?f=0&c=1_2&q="
+        if g.get_bool_setting('general.subtitlelanguage'):
+            url = "https://nyaa.si/?f=0&c=1_0&q="
+        else:
+            url = "https://nyaa.si/?f=0&c=1_2&q="
         data = ''
         return self._process_anime_view(url, data, "latest/%d", page)
 
     def get_latest_dub(self, page=1):
-        url = "https://nyaa.si/?f=0&c=1_2&q=english+dub"
+        if g.get_bool_setting('general.subtitlelanguage'):
+            url = "https://nyaa.si/?f=0&c=1_0&q=english+dub"
+        else:
+            url = "https://nyaa.si/?f=0&c=1_2&q=english+dub"
         data = ''
         return self._process_anime_view(url, data, "latest_dub/%d", page)
 
@@ -517,8 +523,10 @@ class sources(BrowserBase):
                 query += '|"S%sE%s "' %(season, episode.zfill(2))
                 query += '|"S%s - %s "' %(season[1], episode.zfill(2))
                 query += '|"S%s - %s "' %(season[1], episode)
-
-        url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query            
+        if g.get_bool_setting('general.subtitlelanguage'):
+            url = "https://nyaa.si/?f=0&c=1_0&q=%s&s=downloads&o=desc" % query
+        else:
+            url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
 
         if 'one piece' in show.lower() or 'detective conan' in show.lower():
             ret = self._process_nyaa_episodes(url, episode.zfill(3), season) + self._get_episode_sources_pack(show, anilist_id, episode, season)
@@ -667,8 +675,10 @@ class sources(BrowserBase):
             else:
                 season = str(season[0]['info']['season']).zfill(2)
                 query += '|"S%sE%s"' %(season, episode.zfill(2))
-
-        url = "https://nyaa.si/?f=0&c=1_2&q=%s" % query
+        if g.get_bool_setting('general.subtitlelanguage'):
+            url = "https://nyaa.si/?f=0&c=1_0&q=%s" % query
+        else:
+            url = "https://nyaa.si/?f=0&c=1_2&q=%s" % query
         ret =  self._process_nyaa_episodes(url, episode, season, adjusted_episode)
         if not ret:
             return self._get_episode_sources_pack_backup(db_query, anilist_id, episode, season, {'episode_count': episode_in_season_or_part, 'season_episodes': season_episode_total, 'series_episode': final_episode_num_for_part, 'total_episodes':total_episodes, 'previous_seasons_total': total_episode_adjustment, 'original_title': original_title})
@@ -738,7 +748,10 @@ class sources(BrowserBase):
             query += '|"S{0}"|"Season {0}"'.format(str(season).zfill(2))
             #query += '|"S%sE%s"' %(season, episode.zfill(2))
 
-        url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=seeders&&o=desc" % query
+        if g.get_bool_setting('general.subtitlelanguage'):
+            url = "https://nyaa.si/?f=0&c=1_0&q=%s&s=seeders&&o=desc" % query
+        else:
+            url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=seeders&&o=desc" % query
         ret = self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True, season, False, final_season)
 
         if part_num:
@@ -794,15 +807,24 @@ class sources(BrowserBase):
                 _zfill = show.get('zfill', 2)
                 episode = episode.zfill(_zfill)
                 query = requests.utils.quote(query)
-                url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
+                if g.get_bool_setting('general.subtitlelanguage'):
+                    url = "https://nyaa.si/?f=0&c=1_0&q=%s&s=downloads&o=desc" % query
+                else:
+                    url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
                 return self._process_nyaa_backup(url, anilist_id, _zfill, episode)
 
-        url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=seeders&&o=desc" % query
+        if g.get_bool_setting('general.subtitlelanguage'):
+            url = "https://nyaa.si/?f=0&c=1_0&q=%s&s=seeders&&o=desc" % query
+        else:
+            url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=seeders&&o=desc" % query
         return self._process_nyaa_backup(url, anilist_id, 2, episode.zfill(2), True, season, second_part)
 
     def _get_movie_sources(self, query, anilist_id, episode):
         query = requests.utils.quote(query)
-        url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
+        if g.get_bool_setting('general.subtitlelanguage'):
+            url = "https://nyaa.si/?f=0&c=1_0&q=%s&s=downloads&o=desc" % query
+        else:
+            url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
         sources = self._process_nyaa_movie(url, '1')
 
         if not sources:
@@ -819,11 +841,17 @@ class sources(BrowserBase):
         if 'general_title' in show:
             query = show['general_title']
             query = requests.utils.quote(query)
-            url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
+            if g.get_bool_setting('general.subtitlelanguage'):
+                url = "https://nyaa.si/?f=0&c=1_0&q=%s&s=downloads&o=desc" % query
+            else:
+                url = "https://nyaa.si/?f=0&c=1_2&q=%s&s=downloads&o=desc" % query
             return self._process_nyaa_backup(url, episode)
         
         query = requests.utils.quote(show)
-        url = "https://nyaa.si/?f=0&c=1_2&q=%s" % query
+        if g.get_bool_setting('general.subtitlelanguage'):
+            url = "https://nyaa.si/?f=0&c=1_0&q=%s" % query
+        else:
+            url = "https://nyaa.si/?f=0&c=1_2&q=%s" % query
         return self._process_nyaa_movie(url, episode)
 
 class TorrentCacheCheck(object):
