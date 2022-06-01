@@ -324,10 +324,10 @@ class AniListWLF(WatchlistFlavorBase):
 
     def __get_sort(self):
         sort_types = {
-            "Score": "SCORE",
-            "Progress": "PROGRESS",
-            "Last Updated": "UPDATED_TIME",
-            "Last Added": "ADDED_TIME",
+            "Score": "SCORE_DESC",
+            "Progress": "PROGRESS_DESC",
+            "Last Updated": "UPDATED_TIME_DESC",
+            "Last Added": "ADDED_TIME_DESC",
             }
 
         return sort_types[self._sort]
