@@ -564,3 +564,7 @@ msgstr ""
 msgctxt "#40386"
 msgid "Play now"
 msgstr ""
+
+msgctxt "#40387"
+msgid "Search Subs For Language Other Than English"
+msgstr ""

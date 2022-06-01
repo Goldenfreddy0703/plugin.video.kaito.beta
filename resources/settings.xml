@@ -72,6 +72,7 @@
 		<!-- Source Filters -->
 		<setting type="lsep" label="40327"/>
 		<setting type="sep" />
+		<setting id="general.subtitlelanguage" type="bool" label="40387" default="false" />
 		<setting id="general.maxResolution" type="enum" label="40328" values="4k|1080p|720p|NA" default="0" />
 		<setting id="general.disable265" type="bool" label="40329" default="false" />
 		<setting id="general.hidedub" type="bool" label="40330" default="false" />
