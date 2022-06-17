@@ -27,7 +27,7 @@ After each update, it is recommended that you clear cache/rebuild database to ma
 
 ## Kaito Updated Context Menu:
 
-[context.kaito.zip](https://github.com/Goldenfreddy0703/plugin.video.kaito.beta/files/8605380/context.kaito.zip) by @jkaw 
+[context.kaito.zip](https://github.com/Goldenfreddy0703/context.kaito/archive/refs/heads/main.zip) by @jkaw 
 
 ## Todo List:
 - On Netflix Skins like Auramod, When looking at the anime, ratings are not showing unless you click the anime and back out. ( I posted this further up if you would like more information on that.
