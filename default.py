@@ -84,10 +84,11 @@ def seasonCorrectionDatabase(payload, params):
     trakt, content_type = _BROWSER.get_anime_trakt(show_id, True)
     return g.draw_items(trakt, content_type)
 
-@route('find_similar/*')
+@route('find_similar')
 def FIND_SIMILAR(payload, params):
-    anilist_id, mal_id, filter_lang = payload.split("/")[1:]
-    return g.draw_items(_ANILIST_BROWSER.get_recommendation(anilist_id))
+    action_args = params.get('action_args')
+    anilist_id = action_args['anilist_id']
+    _ANILIST_BROWSER.get_recommendation(anilist_id)
 
 @route('authAllDebrid')
 def authAllDebrid(payload, params):
