@@ -259,6 +259,8 @@ class AnilistAPI(ApiBase):
 
     @handle_single_item_or_list
     def _handle_response(self, item):
+        if item.get("mediaRecommendation"):
+            item = item.get("mediaRecommendation")
         item = self._try_detect_type(item)
         art = self._handle_artwork(item)
         # if item.get("type") == "castcrew":

@@ -248,12 +248,21 @@ class AniListBrowser(object):
 
     def get_recommendation(self, anilist_id, page=1):
         variables = {
-            'page': page,
+            'page': g.PAGE,
             'id': anilist_id
             }
-        
-        recommendation = database.get(self.get_recommendations_res, 0.125, variables, page)
-        return self._process_recommendation_view(recommendation, "anichart_popular/%d", page)
+
+        if g.get_bool_setting("general.menus"):
+            variables['page'] = page
+
+        dict_key = ('data', 'Media', 'recommendations', 'nodes')
+
+        anilist_list = self.shows_database.extract_trakt_page(
+            self._URL, query_path="search/anime/recommendations", variables=variables, dict_key=dict_key, page=page, cached=1
+            )
+        #recommendation = database.get(self.get_recommendations_res, 0.125, variables, page)
+        #return self._process_recommendation_view(recommendation, "anichart_popular/%d", page)
+        self.list_builder.show_list_builder(anilist_list)
 
     def get_anilist(self, mal_id):
         variables = {
