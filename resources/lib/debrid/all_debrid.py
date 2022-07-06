@@ -6,7 +6,7 @@ import requests
 from requests.adapters import HTTPAdapter
 from urllib3 import Retry
 from urllib.parse import urljoin
-import re
+import time
 
 from resources.lib.ui import source_utils
 from resources.lib.ui import control
@@ -66,7 +66,10 @@ class AllDebrid(object):
     def get(self, url, **params):
 ##        if not tools.getSetting('alldebrid.enabled') == 'true':
 ##            return
-        params.update({'agent': self.agent_identifier})
+        params.update({
+            "agent": self.agent_identifier,
+            "apikey": self.apikey if not params.pop("reauth", None) else None}
+        )
         return self.session.get(urljoin(self.base_url, url), params=params)
 
     def get_json(self, url, **params):
@@ -76,7 +79,7 @@ class AllDebrid(object):
     def post(self, url, post_data=None, **params):
 ##        if not tools.getSetting('alldebrid.enabled') == 'true' or self.apikey == '':
 ##            return
-        params.update({'agent': self.agent_identifier})
+        params.update({"agent": self.agent_identifier, "apikey": self.apikey})
         return self.session.post(urljoin(self.base_url, url), data=post_data, params=params)
 
     def post_json(self, url, post_data=None, **params):
@@ -197,5 +200,30 @@ class AllDebrid(object):
         self.delete_magnet(magnet_id)
         return self.resolve_hoster(selected_file)
 
+    def saved_magnets(self):
+        return self.get_json("magnet/status")['magnets']
+
     def delete_magnet(self, magnet_id):
-        return self.get_json('magnet/delete', apikey=self.apikey, id=magnet_id)
+        return self.get_json("magnet/delete", id=magnet_id)
+
+    def saved_links(self):
+        return self.get_json("user/links")
+
+    def get_account_status(self):
+        user_info = self.get_user_info()
+        if not isinstance(user_info, dict):
+            return "unknown"
+
+        premium = user_info.get("isPremium")
+        premium_until = user_info.get("premiumUntil", 0)
+        subscribed = user_info.get("isSubscribed")
+        trial = user_info.get("isTrial")
+
+        if premium and premium_until > time.time():
+            return "premium"
+        elif subscribed:
+            return "subscribed"
+        elif trial:
+            return "trial"
+        else:
+            return "unknown"

@@ -175,6 +175,9 @@ class Sources(DisplayWindow):
             if g.premiumize_enabled() and g.get_setting('premiumize.cloudInspection') == 'true':
                 debrid['premiumize'] = True
 
+            if g.all_debrid_enabled() and g.get_setting('alldebrid.cloudInspection') == 'true':
+                debrid['all_debrid'] = True
+
             self.usercloudSources = debrid_cloudfiles.sources().get_sources(debrid, query, episode, anilist_id)
             self.cloud_files += self.usercloudSources
 

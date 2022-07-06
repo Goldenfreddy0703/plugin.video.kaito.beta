@@ -1,19 +1,13 @@
 # -*- coding: utf-8 -*-
 from __future__ import division
 from past.utils import old_div
-import json
-import bs4 as bs
 import re
-import itertools
-from functools import partial
-from ..ui import utils, source_utils
+from ..ui import source_utils
 from ..ui.BrowserBase import BrowserBase
-from ..debrid import real_debrid, premiumize
-from ..ui import database
+from ..debrid import real_debrid, premiumize, all_debrid
+
 import requests
 import threading
-import copy
-import ast
 
 class sources(BrowserBase):
     def __init__(self):
@@ -28,6 +22,10 @@ class sources(BrowserBase):
         if debrid.get('premiumize'):
             self.threads.append(
                 threading.Thread(target=self.premiumize_cloud_inspection, args=(query, episode, anilist_id)))
+
+        if debrid.get('all_debrid'):
+            self.threads.append(
+                threading.Thread(target=self.alldebrid_cloud_inspection, args=(query, episode, anilist_id)))
 
         for i in self.threads:
             i.start()
@@ -109,6 +107,23 @@ class sources(BrowserBase):
             torrent_folder = premiumize.Premiumize().list_folder(torrent['id'])
             identified_file = source_utils.get_best_match('name', torrent_folder, episode)
             self._add_premiumize_cloud_item(identified_file)
+
+    def alldebrid_cloud_inspection(self, query, episode, anilist_id):
+        api = all_debrid.AllDebrid()
+        magnets = [m for m in api.saved_magnets() if m['status'] == "Ready"]
+        cloud_items = [i for link_list in magnets for i in link_list['links']] + self.api_adapter.saved_links()['links']
+        query = re.sub('[^A-Za-z0-9 ()]', ' ', query)
+        episode = str(episode)
+        show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
+        if show:
+            if 'general_title' in show:
+                show = show['general_title']
+            query += ' (' + show + ')'
+        filenames = [re.sub('[^A-Za-z0-9 ()]', '', i['filename']) for i in cloud_items]
+        filenames_query = ','.join(filenames)
+        resp = requests.get('https://armkai.vercel.app/api/fuzzypacks?dict={}&match={}'.format(filenames_query, query)).json()
+        ## finish up
+
 
     def _add_premiumize_cloud_item(self, item):
         self.cloud_files.append({
