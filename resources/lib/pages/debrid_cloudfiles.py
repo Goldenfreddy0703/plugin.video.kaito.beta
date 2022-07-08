@@ -111,7 +111,7 @@ class sources(BrowserBase):
     def alldebrid_cloud_inspection(self, query, episode, anilist_id):
         api = all_debrid.AllDebrid()
         magnets = [m for m in api.saved_magnets() if m['status'] == "Ready"]
-        cloud_items = [i for link_list in magnets for i in link_list['links']] + self.api_adapter.saved_links()['links']
+        cloud_items = [i for link_list in magnets for i in link_list['links']] + api.saved_links()['links']
         query = re.sub('[^A-Za-z0-9 ()]', ' ', query)
         episode = str(episode)
         show = requests.get("https://kaito-title.firebaseio.com/%s.json" % anilist_id).json()
@@ -124,6 +124,13 @@ class sources(BrowserBase):
         resp = requests.get('https://armkai.vercel.app/api/fuzzypacks?dict={}&match={}'.format(filenames_query, query)).json()
         ## finish up
 
+        for i in resp:
+            torrent = cloud_items[i]
+
+            if source_utils.get_best_match('filename', [torrent], episode):
+                identified_file = source_utils.get_best_match('filename', [torrent], episode)
+                self._add_premiumize_cloud_item(identified_file)
+
 
     def _add_premiumize_cloud_item(self, item):
         self.cloud_files.append({
@@ -135,5 +142,18 @@ class sources(BrowserBase):
             'release_title': item['name'],
             'info': source_utils.getInfo(item['name']),
             'debrid_provider': 'premiumize',
+            'size': '.%d GB' %(old_div((old_div(int(item['size']), 1024)), 1024))
+        })
+
+    def _add_alldebrid_cloud_item(self, item):
+        self.cloud_files.append({
+            'quality': source_utils.getQuality(item['filename']),
+            'lang': source_utils.getAudio_lang(item['filename']),
+            'hash': item['link'],
+            'provider': 'Cloud',
+            'type': 'cloud',
+            'release_title': item['filename'],
+            'info': source_utils.getInfo(item['filename']),
+            'debrid_provider': 'alldebrid',
             'size': '.%d GB' %(old_div((old_div(int(item['size']), 1024)), 1024))
         })
