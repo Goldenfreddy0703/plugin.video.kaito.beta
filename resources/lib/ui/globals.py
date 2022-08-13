@@ -371,7 +371,7 @@ class GlobalVariables(object):
         :return:Text wrapped in a Kodi color tag.
         :rtype:str
         """
-        if color is 'default' or color is '' or color is None:
+        if color == 'default' or color == '' or color is None:
             color = 'deepskyblue'
 
         return "[COLOR {}]{}[/COLOR]".format(color, text)
@@ -526,14 +526,14 @@ class GlobalVariables(object):
         params = {'action': urlsplit[0]}
         params['action_args'] = {}
         if 'next page' not in name.lower():
-            if info['mediatype'] is 'tvshow':
+            if info['mediatype'] == 'tvshow':
                 params['action_args']['anilist_id'] = urlsplit[1]
                 if urlsplit[2]:
                     params['action_args']['mal_id'] = urlsplit[2]
-            elif info['mediatype'] is 'episode':
+            elif info['mediatype'] == 'episode':
                 params['action_args']['anilist_id'] = urlsplit[1]
                 params['action_args']['episode'] = urlsplit[2]
-            elif info['mediatype'] is 'movie':
+            elif info['mediatype'] == 'movie':
                 params['action_args']['anilist_id'] = urlsplit[1]
             params['action_args']['mediatype'] = info['mediatype']
             url_route = self.create_url(self.BASE_URL, params)

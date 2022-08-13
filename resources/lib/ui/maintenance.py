@@ -8,12 +8,12 @@ from resources.lib.ui.globals import g
 
 def refresh_apis():
     rd_token = g.get_setting('rd.auth')
-    rd_expiry = int(float(g.get_setting('rd.expiry')))
     kitsu_token = g.get_setting('kitsu.token')
     mal_token = g.get_setting('mal.token')
 
     try:
         if rd_token != '':
+            rd_expiry = int(float(g.get_setting('rd.expiry')))
             if time.time() > (rd_expiry - (10 * 60)):
                 from resources.lib.debrid import real_debrid
 ##                tools.log('Service Refreshing Real Debrid Token')
