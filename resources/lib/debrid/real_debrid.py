@@ -83,7 +83,7 @@ class RealDebrid(object):
             control.ok_dialog(g.ADDON_NAME, g.lang(30104))
 
     def token_request(self):
-        if self.ClientSecret is '':
+        if self.ClientSecret == '':
             return
 
         postData = {'client_id': self.ClientID,
