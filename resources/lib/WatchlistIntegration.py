@@ -105,8 +105,9 @@ def WATCHLIST_WATCHED_UPDATE(payload, params):
             for x in id_watched:
                 if int(id_watched[x]) > 0:
                     database.add_mapping_id_mal(int(x), 'watched_episodes', int(id_watched[x]))
-                    database.mark_episodes_watched(database.get_show_mal(int(x))['anilist_id'], 1, 1, int(id_watched[x]))
-                    database.mark_episodes_watched(database.get_show_mal(int(x))['anilist_id'], 0, int(id_watched[x]) + 1, 1000)
+                    if database.get_show_mal(int(x)) is not None:
+                        database.mark_episodes_watched(database.get_show_mal(int(x))['anilist_id'], 1, 1, int(id_watched[x]))
+                        database.mark_episodes_watched(database.get_show_mal(int(x))['anilist_id'], 0, int(id_watched[x]) + 1, 1000)
             if params['modal'] == 'true':
                 ok = xbmcgui.Dialog().ok("Updated Watchlist", "Show/Episode Markers Updated")
         elif flavor.lower() == 'anilist':
