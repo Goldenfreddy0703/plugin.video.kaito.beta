@@ -133,14 +133,15 @@ class KitsuWLF(WatchlistFlavorBase):
             "sort": self.__get_sort(),
             }
         result = (self._get_request(url, headers=self.__headers(), params=params)).json()
-        self._mapping = [x for x in result['included'] if x['type'] == 'mappings']
-        ret = result["included"]
+        ret = result.get("included")
         kitsu_ids = []
-        for x in ret:
-            kitsu_ids.append(x['id'])
-        watched_eps = {}
-        for x in result["data"]:
-            watched_eps[x['relationships']['anime']['data']['id']] = x['attributes']['progress']
+        if ret:
+            self._mapping = [x for x in result['included'] if x['type'] == 'mappings']
+            for x in ret:
+                kitsu_ids.append(x['id'])
+            watched_eps = {}
+            for x in result["data"]:
+                watched_eps[x['relationships']['anime']['data']['id']] = x['attributes']['progress']
         return self.get_mal_mappings(kitsu_ids), watched_eps
 
     def get_watchlist_status(self, status, offset=0, page=1):
