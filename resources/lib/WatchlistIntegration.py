@@ -241,5 +241,7 @@ def add_watchlist(items):
             "name": "%s's %s" % (flavor.username, flavor.title),
             "action": "watchlist",
             "args": {"flavor": flavor.flavor_name},
-            "menu_item": {"art": {"poster": flavor.image}},
+            "menu_item": {"art": {"poster": flavor.image,
+                                  "thumb": flavor.image,
+                                  "icon": flavor.image}},
         })
