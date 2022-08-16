@@ -16,18 +16,18 @@ from resources.lib.third_party import anitopy
 g.init_globals(sys.argv)
 
 MENU_ITEMS = [
-    {"name": "Next Up", "action": "shows_next_up"},
-    {"name": g.lang(30001), "action": "anilist_airing"},
-    {"name": g.lang(30002), "action": "airing_dub"},
-    {"name": g.lang(30003), "action": "latest"},
-    {"name": g.lang(30004), "action": "latest_dub"},
-    {"name": g.lang(30005), "action": "anilist_trending"},
-    {"name": g.lang(30006), "action": "anilist_popular"},
-    {"name": g.lang(30007), "action": "anilist_upcoming"},
-    {"name": g.lang(30008), "action": "anilist_all_time_popular"},
-    {"name": g.lang(30009), "action": "anilist_genres"},
-    {"name": g.lang(30010), "action": "search_history"},
-    {"name": g.lang(30011), "action": "tools"},
+    {"name": g.lang(30012), "action": "shows_next_up", "menu_item": {"art": {'poster': 'next up.png'}}},
+    {"name": g.lang(30001), "action": "anilist_airing", "menu_item": {"art": {'poster': 'airing anime calendar.png'}}},
+    {"name": g.lang(30002), "action": "airing_dub", "menu_item": {"art": {'poster': 'airing dubbed anime.png'}}},
+    {"name": g.lang(30003), "action": "latest", "menu_item": {"art": {'poster': 'latest.png'}}},
+    {"name": g.lang(30004), "action": "latest_dub", "menu_item": {"art": {'poster': 'latest - english dubbed.png'}}},
+    {"name": g.lang(30005), "action": "anilist_trending", "menu_item": {"art": {'poster': 'trending now.png'}}},
+    {"name": g.lang(30006), "action": "anilist_popular", "menu_item": {"art": {'poster': 'popular this season.png'}}},
+    {"name": g.lang(30007), "action": "anilist_upcoming", "menu_item": {"art": {'poster': 'upcoming next season.png'}}},
+    {"name": g.lang(30008), "action": "anilist_all_time_popular", "menu_item": {"art": {'poster': 'all time popular.png'}}},
+    {"name": g.lang(30009), "action": "anilist_genres", "menu_item": {"art": {'poster': 'genres & tags.png'}}},
+    {"name": g.lang(30010), "action": "search_history", "menu_item": {"art": {'poster': 'search.png'}}},
+    {"name": g.lang(30011), "action": "tools", "menu_item": {"art": {'poster': 'tools.png'}}},
 ]
 
 _TITLE_LANG = g.get_setting("titlelanguage")
@@ -534,21 +534,22 @@ def TMDB_HELPER(payload, params):
 @route('tools')
 def TOOLS_MENU(payload, params):
     TOOLS_ITEMS = [
-        (g.lang(30020), "settings", ''),
-        (g.lang(30021), "clear_cache", ''),
-        (g.lang(30022), "clear_torrent_cache", ''),
-        (g.lang(30023), "clear_history", ''),
-        (g.lang(30026), "rebuild_database", ''),
-        (g.lang(30024), "wipe_addon_data", ''),
-        ]
+        (g.lang(30020), "settings", {"art": {'poster': 'open settings menu.png'}}),
+        (g.lang(30021), "clear_cache", {"art": {'poster': 'clear cache.png'}}),
+        (g.lang(30022), "clear_torrent_cache", {"art": {'poster': 'clear local torrent cache.png'}}),
+        (g.lang(30023), "clear_history", {"art": {'poster': 'clear search history.png'}}),
+        (g.lang(30026), "rebuild_database", {"art": {'poster': 'rebuild database.png'}}),
+        (g.lang(30024), "wipe_addon_data", {"art": {'poster': 'wipe addon data.png'}}),
+    ]
 
     for name, url, image in TOOLS_ITEMS:
         g.add_directory_item(
             name,
             action=url,
+            menu_item=image,
             is_folder=False
         )
-    g.close_directory(g.CONTENT_FOLDER)
+    g.close_directory(g.CONTENT_MENU)
 
 @route('')
 def LIST_MENU(payload, params):
@@ -559,11 +560,12 @@ def LIST_MENU(payload, params):
             action_args=item.get("args"),
             menu_item=item.get("menu_item"),
         )
-    g.close_directory(g.CONTENT_FOLDER)
+    g.close_directory(g.CONTENT_MENU)
     # return g.draw_items(
     #     [g.allocate_item(name, url, True, image) for name, url, image in MENU_ITEMS],
     #     contentType=g.get_setting("contenttype.menu"),
     # )
+
 
 set_browser(_BROWSER)
 _add_last_watched()
