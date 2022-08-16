@@ -53,6 +53,10 @@ msgctxt "#30011"
 msgid "Tools"
 msgstr "כֵּלִים"
 
+msgctxt "#30012"
+msgid "Next Up"
+msgstr ""
+
 msgctxt "#30020"
 msgid "Open Settings Menu"
 msgstr ""
@@ -567,4 +571,16 @@ msgstr ""
 
 msgctxt "#40387"
 msgid "Search Subs For Language Other Than English"
+msgstr ""
+
+msgctxt "#40388"
+msgid "Theme"
+msgstr ""
+
+msgctxt "#40389"
+msgid "Coloured"
+msgstr ""
+
+msgctxt "#40390"
+msgid "White"
 msgstr ""

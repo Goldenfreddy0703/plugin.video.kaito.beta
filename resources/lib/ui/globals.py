@@ -86,7 +86,9 @@ info_dates = [
     "dateadded",
 ]
 
+
 class GlobalVariables(object):
+    CONTENT_MENU = "addons"
     CONTENT_FOLDER = "files"
     CONTENT_MOVIE = "movies"
     CONTENT_SHOW = "tvshows"
@@ -137,6 +139,7 @@ class GlobalVariables(object):
         self.REQUEST_PARAMS = None
         self.FROM_WIDGET = False
         self.PAGE = 1
+        self.THEME = control.getSetting('general.icons').lower()
 
     def __del__(self):
         self.deinit()
@@ -289,7 +292,7 @@ class GlobalVariables(object):
             "special://database/"
         )
         self.IMAGES_PATH = control.translate_path(
-            os.path.join(self.ADDON_DATA_PATH, "resources", "images")
+            os.path.join(self.ADDON_DATA_PATH, "resources", "images", self.THEME)
         )
         self.CACHE_DB_PATH = control.translate_path(
             os.path.join(self.ADDON_USERDATA_PATH, "cache.db")
@@ -776,6 +779,7 @@ class GlobalVariables(object):
             art["icon"] = os.path.join(self.IMAGES_PATH, 'next.png')
             art["thumb"] = os.path.join(self.IMAGES_PATH, 'next.png')
         try:
+            art = {key: value if '/' in value or '\\' in value else os.path.join(self.IMAGES_PATH, value) for key, value in art.items()}
             item.setArt(art)
         except:
             pass

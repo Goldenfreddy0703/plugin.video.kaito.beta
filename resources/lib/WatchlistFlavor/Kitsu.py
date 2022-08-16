@@ -15,7 +15,8 @@ class KitsuWLF(WatchlistFlavorBase):
     _URL = "https://kitsu.io/api"
     _TITLE = "Kitsu"
     _NAME = "kitsu"
-    _IMAGE = "https://canny.io/images/13895523beb5ed9287424264980221d4.png"
+    # _IMAGE = "https://canny.io/images/13895523beb5ed9287424264980221d4.png"
+    _IMAGE = "kitsu.png"
     _mapping = None
 
     def login(self):
@@ -105,9 +106,12 @@ class KitsuWLF(WatchlistFlavorBase):
             g.add_directory_item(
                 name,
                 action='watchlist_status_type',
+                menu_item={"art": {'poster': name.lower() + '.png',
+                                   'thumb': name.lower() + '.png',
+                                   'icon': name.lower() + '.png'}},
                 action_args={"flavor": "kitsu", "status": status}
             )
-        g.close_directory(g.CONTENT_FOLDER)
+        g.close_directory(g.CONTENT_MENU)
 
     def __kitsu_statuses(self):
         statuses = [
@@ -116,7 +120,7 @@ class KitsuWLF(WatchlistFlavorBase):
             ("Completed", "completed"),
             ("On Hold", "on_hold"),
             ("Dropped", "dropped"),
-            ]
+        ]
 
         return statuses
 

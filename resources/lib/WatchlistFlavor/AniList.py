@@ -9,13 +9,15 @@ from ..ui import database
 from resources.lib.ui.globals import g
 from .WatchlistFlavorBase import WatchlistFlavorBase
 
+
 class AniListWLF(WatchlistFlavorBase):
     _URL = "https://graphql.anilist.co"
     _TITLE = "AniList"
     _NAME = "anilist"
-    _IMAGE = "https://anilist.co/img/icons/logo_full.png"
+    # _IMAGE = "https://anilist.co/img/icons/logo_full.png"
+    _IMAGE = "anilist.png"
 
-    #Not login, but retrieveing userId for watchlist
+    # Not login, but retrieveing userId for watchlist
     def login(self):
         query = '''
         query {
@@ -60,9 +62,12 @@ class AniListWLF(WatchlistFlavorBase):
             g.add_directory_item(
                 name,
                 action='watchlist_status_type',
+                menu_item={"art": {'poster': name.lower() + '.png',
+                                   'thumb': name.lower() + '.png',
+                                   'icon': name.lower() + '.png'}},
                 action_args={"flavor": "anilist", "status": status}
             )
-        g.close_directory(g.CONTENT_FOLDER)
+        g.close_directory(g.CONTENT_MENU)
         # all_results = list(map(self._base_watchlist_view, self.__anilist_statuses()))
         # all_results = list(itertools.chain(*all_results))
         # return all_results
@@ -75,7 +80,7 @@ class AniListWLF(WatchlistFlavorBase):
             ("Paused", "PAUSED"),
             ("Completed", "COMPLETED"),
             ("Dropped", "DROPPED"),
-            ]
+        ]
 
         return statuses
 
@@ -211,7 +216,7 @@ class AniListWLF(WatchlistFlavorBase):
         #     except:
         #         pass
 
-##        kodi_meta = self._get_kodi_meta(res['id'], 'anilist')
+        # kodi_meta = self._get_kodi_meta(res['id'], 'anilist')
 
         info = {}
 
@@ -408,7 +413,6 @@ class AniListWLF(WatchlistFlavorBase):
         result = self._post_request(self._URL, headers=self.__headers(), json={'query': query, 'variables': variables})
 
         return result.json()['data']['MediaListCollection']['lists']
-
 
     def __update_library(self, episode, anilist_id):
         query = '''
