@@ -60,7 +60,9 @@ class KaitoBrowser(BrowserBase):
         g.add_directory_item(
             "New Search",
             action="search",
-            menu_item={"art": {'poster': 'new search.png'}}
+            menu_item={"art": {'poster': 'new search.png',
+                               'thumb': 'new search.png',
+                               'icon': 'new search.png'}}
         )
 
         if g.get_bool_setting("general.menus"):
@@ -85,7 +87,9 @@ class KaitoBrowser(BrowserBase):
             "Clear Search History...",
             action="clear_history",
             mediatype="tvshow",
-            menu_item={"art": {'poster': 'clear search history.png'}},
+            menu_item={"art": {'poster': 'clear search history.png',
+                               'icon': 'clear search history.png',
+                               'thumb': 'clear search history.png'}},
             is_folder=False,
         )
         g.close_directory(g.CONTENT_MENU)

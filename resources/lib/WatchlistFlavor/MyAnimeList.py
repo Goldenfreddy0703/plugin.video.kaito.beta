@@ -96,7 +96,9 @@ class MyAnimeListWLF(WatchlistFlavorBase):
             g.add_directory_item(
                 name,
                 action='watchlist_status_type',
-                menu_item={"art": {'poster': name.lower() + '.png'}},
+                menu_item={"art": {'poster': name.lower() + '.png',
+                                   'thumb': name.lower() + '.png',
+                                   'icon': name.lower() + '.png'}},
                 action_args={"flavor": "mal", "status": status}
             )
         g.close_directory(g.CONTENT_MENU)

@@ -16,18 +16,42 @@ from resources.lib.third_party import anitopy
 g.init_globals(sys.argv)
 
 MENU_ITEMS = [
-    {"name": g.lang(30012), "action": "shows_next_up", "menu_item": {"art": {'poster': 'next up.png'}}},
-    {"name": g.lang(30001), "action": "anilist_airing", "menu_item": {"art": {'poster': 'airing anime calendar.png'}}},
-    {"name": g.lang(30002), "action": "airing_dub", "menu_item": {"art": {'poster': 'airing dubbed anime.png'}}},
-    {"name": g.lang(30003), "action": "latest", "menu_item": {"art": {'poster': 'latest.png'}}},
-    {"name": g.lang(30004), "action": "latest_dub", "menu_item": {"art": {'poster': 'latest - english dubbed.png'}}},
-    {"name": g.lang(30005), "action": "anilist_trending", "menu_item": {"art": {'poster': 'trending now.png'}}},
-    {"name": g.lang(30006), "action": "anilist_popular", "menu_item": {"art": {'poster': 'popular this season.png'}}},
-    {"name": g.lang(30007), "action": "anilist_upcoming", "menu_item": {"art": {'poster': 'upcoming next season.png'}}},
-    {"name": g.lang(30008), "action": "anilist_all_time_popular", "menu_item": {"art": {'poster': 'all time popular.png'}}},
-    {"name": g.lang(30009), "action": "anilist_genres", "menu_item": {"art": {'poster': 'genres & tags.png'}}},
-    {"name": g.lang(30010), "action": "search_history", "menu_item": {"art": {'poster': 'search.png'}}},
-    {"name": g.lang(30011), "action": "tools", "menu_item": {"art": {'poster': 'tools.png'}}},
+    {"name": g.lang(30012), "action": "shows_next_up", "menu_item": {"art": {'poster': 'next up.png',
+                                                                             'thumb': 'next up.png',
+                                                                             'icon': 'next up.png'}}},
+    {"name": g.lang(30001), "action": "anilist_airing", "menu_item": {"art": {'poster': 'airing anime calendar.png',
+                                                                              'thumb': 'airing anime calendar.png',
+                                                                              'icon': 'airing anime calendar.png'}}},
+    {"name": g.lang(30002), "action": "airing_dub", "menu_item": {"art": {'poster': 'airing dubbed anime.png',
+                                                                          'thumb': 'airing dubbed anime.png',
+                                                                          'icon': 'airing dubbed anime.png'}}},
+    {"name": g.lang(30003), "action": "latest", "menu_item": {"art": {'poster': 'latest.png',
+                                                                      'thumb': 'latest.png',
+                                                                      'icon': 'latest.png'}}},
+    {"name": g.lang(30004), "action": "latest_dub", "menu_item": {"art": {'poster': 'latest - english dubbed.png',
+                                                                          'thumb': 'latest - english dubbed.png',
+                                                                          'icon': 'latest - english dubbed.png'}}},
+    {"name": g.lang(30005), "action": "anilist_trending", "menu_item": {"art": {'poster': 'trending now.png',
+                                                                                'thumb': 'trending now.png',
+                                                                                'icon': 'trending now.png'}}},
+    {"name": g.lang(30006), "action": "anilist_popular", "menu_item": {"art": {'poster': 'popular this season.png',
+                                                                               'thumb': 'popular this season.png',
+                                                                               'icon': 'popular this season.png'}}},
+    {"name": g.lang(30007), "action": "anilist_upcoming", "menu_item": {"art": {'poster': 'upcoming next season.png',
+                                                                                'thumb': 'upcoming next season.png',
+                                                                                'icon': 'upcoming next season.png'}}},
+    {"name": g.lang(30008), "action": "anilist_all_time_popular", "menu_item": {"art": {'poster': 'all time popular.png',
+                                                                                        'thumb': 'all time popular.png',
+                                                                                        'icon': 'all time popular.png'}}},
+    {"name": g.lang(30009), "action": "anilist_genres", "menu_item": {"art": {'poster': 'genres & tags.png',
+                                                                              'thumb': 'genres & tags.png',
+                                                                              'icon': 'genres & tags.png'}}},
+    {"name": g.lang(30010), "action": "search_history", "menu_item": {"art": {'poster': 'search.png',
+                                                                              'thumb': 'search.png',
+                                                                              'icon': 'search.png'}}},
+    {"name": g.lang(30011), "action": "tools", "menu_item": {"art": {'poster': 'tools.png',
+                                                                     'thumb': 'tools.png',
+                                                                     'icon': 'tools.png'}}},
 ]
 
 _TITLE_LANG = g.get_setting("titlelanguage")
@@ -293,8 +317,8 @@ def SEARCH_HISTORY(payload, params):
     history = SearchHistory().get_search_history("show")
     if "Yes" in g.get_setting('searchhistory') :
         _BROWSER.search_history(history)
-    else :
-        return SEARCH(payload,params)
+    else:
+        return SEARCH(payload, params)
 
 @route('clear_history')
 def CLEAR_HISTORY(payload, params):
@@ -312,7 +336,7 @@ def SEARCH(payload, params):
         return False
 
     # TODO: Better logic here, maybe move functionatly into router?
-    if "Yes" in g.get_setting('searchhistory') :
+    if "Yes" in g.get_setting('searchhistory'):
         SearchHistory().add_search_history("show", query)
 
     if g.get_bool_setting("general.menus"):
@@ -534,12 +558,24 @@ def TMDB_HELPER(payload, params):
 @route('tools')
 def TOOLS_MENU(payload, params):
     TOOLS_ITEMS = [
-        (g.lang(30020), "settings", {"art": {'poster': 'open settings menu.png'}}),
-        (g.lang(30021), "clear_cache", {"art": {'poster': 'clear cache.png'}}),
-        (g.lang(30022), "clear_torrent_cache", {"art": {'poster': 'clear local torrent cache.png'}}),
-        (g.lang(30023), "clear_history", {"art": {'poster': 'clear search history.png'}}),
-        (g.lang(30026), "rebuild_database", {"art": {'poster': 'rebuild database.png'}}),
-        (g.lang(30024), "wipe_addon_data", {"art": {'poster': 'wipe addon data.png'}}),
+        (g.lang(30020), "settings", {"art": {'poster': 'open settings menu.png',
+                                             'thumb': 'open settings menu.png',
+                                             'icon': 'open settings menu.png'}}),
+        (g.lang(30021), "clear_cache", {"art": {'poster': 'clear cache.png',
+                                                'thumb': 'clear cache.png',
+                                                'icon': 'clear cache.png'}}),
+        (g.lang(30022), "clear_torrent_cache", {"art": {'poster': 'clear local torrent cache.png',
+                                                        'thumb': 'clear local torrent cache.png',
+                                                        'icon': 'clear local torrent cache.png'}}),
+        (g.lang(30023), "clear_history", {"art": {'poster': 'clear search history.png',
+                                                  'thumb': 'clear search history.png',
+                                                  'icon': 'clear search history.png'}}),
+        (g.lang(30026), "rebuild_database", {"art": {'poster': 'rebuild database.png',
+                                                     'thumb': 'rebuild database.png',
+                                                     'icon': 'rebuild database.png'}}),
+        (g.lang(30024), "wipe_addon_data", {"art": {'poster': 'wipe addon data.png',
+                                                    'thumb': 'wipe addon data.png',
+                                                    'icon': 'wipe addon data.png'}}),
     ]
 
     for name, url, image in TOOLS_ITEMS:
