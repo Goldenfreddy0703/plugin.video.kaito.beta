@@ -60,6 +60,7 @@ class KaitoBrowser(BrowserBase):
         g.add_directory_item(
             "New Search",
             action="search",
+            menu_item={"art": {'poster': 'new search.png'}}
         )
 
         if g.get_bool_setting("general.menus"):
@@ -84,9 +85,10 @@ class KaitoBrowser(BrowserBase):
             "Clear Search History...",
             action="clear_history",
             mediatype="tvshow",
+            menu_item={"art": {'poster': 'clear search history.png'}},
             is_folder=False,
         )
-        g.close_directory(g.CONTENT_FOLDER)
+        g.close_directory(g.CONTENT_MENU)
 
     def get_airing_dub(self):
         resp = requests.get('https://arm2.vercel.app/api/airingdub')
