@@ -444,7 +444,7 @@ class AnilistSyncDatabase(Database):
 
         result = {
             "info": {
-                key: value
+                key: value.replace('<i>', '[I]').replace('</i>', '[/I]').replace('<br>', '[CR]') if isinstance(value, str) else value
                 for key, value in item.get("info", {}).items()
                 if key != "seasons" and key != "episodes"
             },
