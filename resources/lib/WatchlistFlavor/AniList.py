@@ -226,7 +226,7 @@ class AniListWLF(WatchlistFlavorBase):
             pass
 
         try:
-            info['plot'] = res['description']
+            info['plot'] = res['description'].replace('<i>', '[I]').replace('</i>', '[/I]').replace('<br>', '[CR]')
         except:
             pass
 
