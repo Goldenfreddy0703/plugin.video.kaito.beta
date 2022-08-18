@@ -193,16 +193,16 @@
                     <colordiffuse>AA2e2d32</colordiffuse>
                 </control>
                 <control type="label">
-                    <top>20</top>
+                    <top>13</top>
                     <left>10</left>
-                    <width>1000</width>
-                    <height>0</height>
-                    <font>font14</font>
+                    <width>1400</width>
+                    <height>5</height>
+                    <font>font12</font>
                     <textcolor>66FFFFFF</textcolor>
 		    <shadowcolor>dimgrey</shadowcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
+                    <label>[B]$INFO[ListItem.Label][/B]</label>
                 </control>
                 <control type="label">
                     <top>70</top>
@@ -313,16 +313,16 @@
                     <colordiffuse>77d3d3d3</colordiffuse>
                 </control>
                 <control type="label">
-                    <top>20</top>
+                    <top>13</top>
                     <left>10</left>
-                    <width>1000</width>
-                    <height>0</height>
-                    <font>font14</font>
+                    <width>1400</width>
+                    <height>5</height>
+                    <font>font12</font>
                     <textcolor>FFFFFFFF</textcolor>
 		    <shadowcolor>dimgrey</shadowcolor>
                     <align>left</align>
                     <aligny>center</aligny>
-                    <label>[B][UPPERCASE]$INFO[ListItem.Label][/UPPERCASE][/B]</label>
+                    <label>[B]$INFO[ListItem.Label][/B]</label>
                 </control>
                 <control type="label">
                     <top>70</top>
