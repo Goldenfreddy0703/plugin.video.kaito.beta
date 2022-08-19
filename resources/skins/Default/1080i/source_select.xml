@@ -253,10 +253,10 @@
                 </control>
                 <control type="label">
                     <centertop>70%</centertop>
-                    <left>830</left>
+                    <left>750</left>
                     <width>350</width>
                     <height>0</height>
-                    <font>font14</font>
+                    <font>font10</font>
                     <textcolor>66FFFFFF</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -373,10 +373,10 @@
                 </control>
                 <control type="label">
                     <centertop>70%</centertop>
-                    <left>830</left>
+                    <left>750</left>
                     <width>350</width>
                     <height>0</height>
-                    <font>font14</font>
+                    <font>font10</font>
                     <textcolor>66FFFFFF</textcolor>
                     <align>left</align>
                     <aligny>center</aligny>
@@ -389,7 +389,7 @@
                     <width>128.8</width>
                     <height>87.2</height>
                     <texture background="true" colordiffuse="yellow">$INFO[Window().Property(skin.dir)]/resources/skins/media/quality/qualitysd480.png</texture>
-                    <visible>String.Contains(ListItem.Property(quality),SD)</visible>
+                    <visible>String.Contains(ListItem.Property(quality),480P)</visible>
                 </control>
                 <control type="image">
                     <centertop>50%</centertop>
