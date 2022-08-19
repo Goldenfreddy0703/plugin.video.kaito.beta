@@ -276,7 +276,7 @@
                     <left>1010</left>
                     <width>128.8</width>
                     <height>87.2</height>
-                    <texture background="true">$INFO[Window().Property(skin.dir)]/resources/skins/media/quality/qualityhd720.png</texture>
+                    <texture background="true" colordiffuse="red">$INFO[Window().Property(skin.dir)]/resources/skins/media/quality/qualityhd720.png</texture>
                     <visible>String.Contains(ListItem.Property(quality),720P)</visible>
                 </control>
                 <control type="image">
