@@ -24,7 +24,7 @@ Github Project: https://github.com/Goldenfreddy0703/Otaku
 ## Requirements for Otaku
 
 Kodi 18 Leia or later versions.
-Works fine on Kodi 20 Nexus Alpha 2
+Works fine on Kodi 20 Nexus Alpha 3
 
 # Installation & Updates for Otaku
 
