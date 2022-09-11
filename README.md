@@ -13,7 +13,7 @@ Hey there, me and my team decided that it was best to end development for this a
 
 ## We Are Starting Fresh
 
-Me and my team are now called Team Otaku and we are working on a new anime addon called Otaku. Otaku is a fork of Kaito 0.0.10 and we decided to improve the crap out of it instead. It's bascially the same as Katio Beta but it's alot faster, some old features are back and better then ever, we have a list of things to complete, alot of new features and new menu items will be coming in the near future. 
+Me and my team are now called Team Otaku and we are working on a new anime addon called Otaku. Otaku is a fork of Kaito 0.0.10 and we decided to improve the crap out of it instead. It's basically the same as Katio Beta but it's alot faster, some old features are back and better then ever, we have a list of things to complete, alot of new features and new menu items will be coming in the near future. 
 
 We hope you guys like it and we hope you guys could contribute and give us feedback about our addon.
 
